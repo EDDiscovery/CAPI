@@ -53,7 +53,7 @@ namespace BaseUtils.DDE
 
         public bool AddTopic(string topic, Action<IntPtr> action)
         {
-            IntPtr TopicHandle = NativeMethods.DdeCreateStringHandleW(DdeInstance, "System", (int)CodePages.CP_WINUNICODE);
+            IntPtr TopicHandle = NativeMethods.DdeCreateStringHandleW(DdeInstance, topic, (int)CodePages.CP_WINUNICODE);
             if (TopicHandle != IntPtr.Zero)
             {
                 TopicHandles.Add(TopicHandle);
