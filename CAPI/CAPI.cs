@@ -35,7 +35,6 @@ namespace CAPI
             LoggedOut,
             AwaitingCallback,
             Authorized,
-            NoClientIDConfigured,
             TokenRefresh,
         };
 
@@ -54,7 +53,26 @@ namespace CAPI
             this.useragent = useragent;
         }
 
-        public bool Login(string username, bool gameisbeta = false)           // login for this user..
+        // is the user credential file present, and if so, has it tokens so its been logged in
+
+        public bool IsCredentialFilePresent(string username, out bool isloggedin)
+        {
+            isloggedin = false;
+            string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
+            if (File.Exists(credfile))
+            {
+                var credentials = CompanionAppCredentials.Load(credfile);
+                isloggedin = credentials.IsAccessRefreshTokenPresent;
+                return true;
+            }
+            else
+                return false;
+        }
+
+        // login for user, we can login over another user
+        // returns true if operating okay (may be performing user login) or false if can't log in
+
+        public bool Login(string username, bool gameisbeta = false)           
         {
             if (clientID == null && clientID.Length>0)    // must have an ID, else service is disabled
                 return false;
@@ -75,9 +93,14 @@ namespace CAPI
             {
                 RefreshToken();
             }
+            catch ( EliteDangerousCompanionWebException ws)                 // web exceptions, they happen. don't lost the refresh token over it
+            {
+                System.Diagnostics.Debug.WriteLine(ws);
+                return false;
+            }
             catch (Exception)
             {
-                AskForLogin();
+                AskForLogin();          // and login
             }
 
             return true;        // everything is ok, either we have logged in, or we are in the process of asking the user for a login
@@ -92,14 +115,18 @@ namespace CAPI
             cachedProfile = null;
         }
 
+        // throws web exception, or AuthenticationException (logs you out).  Else its got the access token and your good to go
+
         private void RefreshToken()  // may throw
         {
             if (Credentials.refreshToken == null)
             {
+                Logout();
                 throw new EliteDangerousCompanionAppAuthenticationException("Refresh token not found, need full login");
             }
 
             CurrentState = State.TokenRefresh;
+
             HttpWebRequest request = GetRequest(AUTH_SERVER + TOKEN_URL);
             request.ContentType = "application/x-www-form-urlencoded";
             request.Method = "POST";
@@ -114,8 +141,9 @@ namespace CAPI
             {
                 if (response == null)
                 {
-                    throw new EliteDangerousCompanionAppException("Failed to contact API server");
+                    throw new EliteDangerousCompanionWebException("Failed to contact API server");
                 }
+
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     string responseData = getResponseData(response);
@@ -124,29 +152,25 @@ namespace CAPI
                     Credentials.accessToken = (string)json["access_token"];
                     Credentials.tokenExpiry = DateTime.UtcNow.AddSeconds((double)json["expires_in"]);
                     Credentials.Save();
+
                     if (Credentials.accessToken == null)
                     {
-                        CurrentState = State.LoggedOut;
+                        Logout();
                         throw new EliteDangerousCompanionAppAuthenticationException("Access token not found");
                     }
+
                     CurrentState = State.Authorized;
                 }
                 else
                 {
-                    CurrentState = State.LoggedOut;
+                    Logout();
                     throw new EliteDangerousCompanionAppAuthenticationException("Invalid refresh token");
                 }
             }
         }
 
-        private void AskForLogin()      // Throws an exception if not logged out
+        private void AskForLogin()      
         {
-            if (CurrentState != State.LoggedOut)
-            {
-                // Shouldn't be here
-                throw new EliteDangerousCompanionAppIllegalStateException("Service in incorrect state to login (" + CurrentState + ")");
-            }
-
             CurrentState = State.AwaitingCallback;
 
             RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
@@ -256,6 +280,7 @@ namespace CAPI
                         {
                             throw new EliteDangerousCompanionAppAuthenticationException("Access token not found");
                         }
+
                         CurrentState = State.Authorized;
                     }
                     else
@@ -328,59 +353,53 @@ namespace CAPI
             return Get(SHIPYARD_URL);
         }
 
+        // will try and get endpoint. Null means a web problem or we are not authorised.
+
         private string Get(string endpoint)
         {
+            if (CurrentState != State.Authorized)
+                return null;
+
             string serverurl = GameIsBeta ? BETA_SERVER : LIVE_SERVER;
 
-            string data = obtainProfile(serverurl + endpoint, out DateTime timestamp);
-
-            if (data == null || data == "Profile unavailable")
+            if (Credentials.Expired )
             {
-                Logout();
-                AskForLogin();
-                data = null;
-            }
-
-            return data;
-        }
-
-        // May return null - check
-        private string obtainProfile(string url, out DateTime timestamp)
-        {
-            DateTime expiry = Credentials?.tokenExpiry.AddSeconds(-60) ?? DateTime.MinValue;
-            if (DateTime.UtcNow > expiry)
-            {
-                RefreshToken();
-            }
-
-            timestamp = DateTime.MinValue;
-
-            if (CurrentState == State.Authorized)
-            {
-                HttpWebRequest request = GetRequest(url);
-                using (HttpWebResponse response = GetResponse(request))
+                try
                 {
-                    if (response == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine("Failed to contact API server");
-                        return null;
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Found)
-                    {
-                        timestamp = DateTime.MinValue;
-                        return null;
-                    }
-
-                    DateTime.TryParse(response.Headers.Get("date"), out timestamp);
-                    timestamp = timestamp.ToUniversalTime();
-                    return getResponseData(response);
+                    RefreshToken();     
+                }
+                catch (EliteDangerousCompanionWebException ws)
+                {
+                    System.Diagnostics.Debug.WriteLine(ws);
+                    return null;
+                }
+                catch (Exception ex)        // any other and we are logged out
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+                    AskForLogin();          // ask for a login
+                    return null;
                 }
             }
-            else
+
+            // we have access..
+            System.Diagnostics.Debug.Assert(CurrentState == State.Authorized);
+
+            HttpWebRequest request = GetRequest(serverurl + endpoint);
+
+            using (HttpWebResponse response = GetResponse(request))
             {
-                System.Diagnostics.Debug.WriteLine("Service in incorrect state to provide profile (" + CurrentState + ")");
-                return null;
+                if (response == null)
+                {
+                    System.Diagnostics.Debug.WriteLine("Failed to contact API server");
+                    return null;
+                }
+
+                if (response.StatusCode == HttpStatusCode.Found)
+                {
+                    return null;
+                }
+
+                return getResponseData(response);
             }
         }
 
@@ -501,19 +520,14 @@ namespace CAPI
 
     }
 
-    public class EliteDangerousCompanionAppIllegalStateException : Exception
-    {
-        public EliteDangerousCompanionAppIllegalStateException(string message) : base(message) { }
-    }
-
     public class EliteDangerousCompanionAppAuthenticationException : Exception
     {
         public EliteDangerousCompanionAppAuthenticationException(string message) : base(message) { }
     }
 
-    public class EliteDangerousCompanionAppException : Exception
+    public class EliteDangerousCompanionWebException : Exception
     {
-        public EliteDangerousCompanionAppException(string message) : base(message) { }
+        public EliteDangerousCompanionWebException(string message) : base(message) { }
     }
 
     

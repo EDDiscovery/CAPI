@@ -26,7 +26,14 @@ namespace CAPI
     {
         public string accessToken { get; set; }
         public string refreshToken { get; set; }
-        public DateTime tokenExpiry { get; set; }
+        public DateTime tokenExpiry { get; set; } = new DateTime(2000, 1, 1);       // set to a old date, but not min date, because of Expired
+
+        [JsonIgnoreAttribute]
+        public bool IsAccessRefreshTokenPresent { get { return accessToken != null && refreshToken != null; } }
+        [JsonIgnoreAttribute]
+        public bool Expired { get { return DateTime.UtcNow >= tokenExpiry.AddSeconds(-60); } }
+        [JsonIgnoreAttribute]
+        public string savedPath { get; set; }
 
         /// <summary>
         /// Clear the information held by credentials.
@@ -35,10 +42,9 @@ namespace CAPI
         {
             accessToken = null;
             refreshToken = null;
+            tokenExpiry = new DateTime(2000, 1, 1);
         }
 
-        [JsonIgnoreAttribute]
-        public string savedPath { get; set; }
 
         public static CompanionAppCredentials Load(string filepath)
         {

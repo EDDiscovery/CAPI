@@ -21,7 +21,6 @@ namespace CAPIDemo
     {
         CompanionAPI capi;
         DDEServer ddeserver;
-        string uri = "eddiscovery";
 
         public CapiDemoForm()
         {
@@ -31,6 +30,7 @@ namespace CAPIDemo
 
             string appPath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
 
+            string uri = "eddiscovery";
             string ddeservername = "edd-dde-server";
             DDEServer.RegisterURICallback(uri, appPath, ddeservername);
 
@@ -113,6 +113,8 @@ namespace CAPIDemo
                 else
                     richTextBox.Text += "No profile" + Environment.NewLine;
 
+                richTextBox.Select(richTextBox.Text.Length - 1, 1);
+                richTextBox.ScrollToCaret();
             }
         }
 
@@ -147,6 +149,9 @@ namespace CAPIDemo
                 }
                 else
                     richTextBox.Text += "No market data" + Environment.NewLine;
+
+                richTextBox.Select(richTextBox.Text.Length - 1, 1);
+                richTextBox.ScrollToCaret();
             }
         }
 
@@ -172,6 +177,9 @@ namespace CAPIDemo
                 }
                 else
                     richTextBox.Text += "No Ship data" + Environment.NewLine;
+
+                richTextBox.Select(richTextBox.Text.Length - 1, 1);
+                richTextBox.ScrollToCaret();
             }
 
         }
