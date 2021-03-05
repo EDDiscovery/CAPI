@@ -49,9 +49,9 @@
     <Compile Include="Shipyard.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaseUtilsSub\BaseUtilsSub.csproj">
+    <ProjectReference Include="..\BaseUtilities\BaseUtilities\BaseUtils.csproj">
       <Project>{86fa5950-1f64-4c1e-820d-18d412cb89f2}</Project>
-      <Name>BaseUtilsSub</Name>
+      <Name>BaseUtils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

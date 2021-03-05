@@ -7,8 +7,8 @@
     <ProjectGuid>{86FA5950-1F64-4C1E-820D-18D412CB89F2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BaseUtilsSub</RootNamespace>
-    <AssemblyName>BaseUtilsSub</AssemblyName>
+    <RootNamespace>BaseUtilities</RootNamespace>
+    <AssemblyName>BaseUtilities</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

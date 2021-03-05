@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAPIDemo", "capidemo\CAPIDe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAPI", "CAPI\CAPI.csproj", "{465C72D9-F10B-4CC6-A5DC-16ED65881655}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseUtilsSub", "BaseUtilsSub\BaseUtilsSub.csproj", "{86FA5950-1F64-4C1E-820D-18D412CB89F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseUtils", "BaseUtilities\BaseUtilities\BaseUtils.csproj", "{86FA5950-1F64-4C1E-820D-18D412CB89F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
