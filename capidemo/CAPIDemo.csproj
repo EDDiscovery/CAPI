@@ -82,6 +82,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BaseUtilsSub\BaseUtilsSub.csproj">
+      <Project>{86fa5950-1f64-4c1e-820d-18d412cb89f2}</Project>
+      <Name>BaseUtilsSub</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CAPI\CAPI.csproj">
       <Project>{465c72d9-f10b-4cc6-a5dc-16ed65881655}</Project>
       <Name>CAPI</Name>
