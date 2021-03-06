@@ -35,55 +35,62 @@ namespace CAPI
             LoggedOut,
             AwaitingCallback,
             Authorized,
-            TokenRefresh,
+            // not states, but messages in StatusChange
+            AuthorizationFailed,
+            RefreshSucceeded,
         };
+
+        public Action<State> StatusChange { get; set; }        
 
         public State CurrentState { get; set; } = State.LoggedOut;
         public CompanionAppCredentials Credentials;
         public bool Active => CurrentState == State.Authorized;
         public bool LoggedOut => CurrentState == State.LoggedOut;
-        public bool GameIsBeta { get; private set; }
-        public string User { get; private set; }
+        public bool ClientIDAvailable { get { return !string.IsNullOrEmpty(clientID); } }
 
+        public string User { get; private set; }                        // current user
+        public string URI { get; private set; }                         // URI for callback
+        public string UserAgentNameVersion { get; private set; }        // GreatProgram-1.2.3.4
+
+        public bool GameIsBeta { get; set; } = false;           // call to set to beta server
+            
         public CompanionAPI(string credentialpath, string clientinfo, string useragent, string uri)
         {
             this.credentialpath = credentialpath;
             this.clientID = clientinfo;
-            this.uri = uri;
-            this.useragent = useragent;
+            this.URI = uri;
+            this.UserAgentNameVersion = useragent;
         }
 
         // is the user credential file present, and if so, has it tokens so its been logged in
+        // otherwise, we are either logged out (crediential file present but empty) or never logged in
 
-        public bool IsCredentialFilePresent(string username, out bool isloggedin)
+        public bool HasUserBeenLoggedIn(string username)
         {
-            isloggedin = false;
             string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
             if (File.Exists(credfile))
             {
                 var credentials = CompanionAppCredentials.Load(credfile);
-                isloggedin = credentials.IsAccessRefreshTokenPresent;
-                return true;
+                return credentials.IsAccessRefreshTokenPresent;
             }
-            else
-                return false;
+
+            return false;
         }
 
         // login for user, we can login over another user
         // returns true if operating okay (may be performing user login) or false if can't log in
 
-        public bool Login(string username, bool gameisbeta = false)           
+        public bool LogIn(string username)           
         {
-            if (clientID == null && clientID.Length>0)    // must have an ID, else service is disabled
+            if (!ClientIDAvailable)                                 // must have an ID, else service is disabled
                 return false;
 
-            if (username == User && CurrentState != State.LoggedOut && GameIsBeta == gameisbeta)     // if logged in to the same user
+            if (username == User && CurrentState != State.LoggedOut)     // if logged in to the same user
                 return true;
 
             string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
             Credentials = CompanionAppCredentials.Load(credfile);
 
-            GameIsBeta = gameisbeta;
             User = username;
 
             CurrentState = State.LoggedOut;         // clear state back to logged out
@@ -107,12 +114,13 @@ namespace CAPI
         }
 
         // Log out of the companion API and remove local credentials
-        public void Logout()
+        public void LogOut()
         {
             Credentials.Clear();
             Credentials.Save();
             CurrentState = State.LoggedOut;
             cachedProfile = null;
+            StatusChange?.Invoke(CurrentState);
         }
 
         // throws web exception, or AuthenticationException (logs you out).  Else its got the access token and your good to go
@@ -121,11 +129,9 @@ namespace CAPI
         {
             if (Credentials.refreshToken == null)
             {
-                Logout();
+                LogOut();
                 throw new EliteDangerousCompanionAppAuthenticationException("Refresh token not found, need full login");
             }
-
-            CurrentState = State.TokenRefresh;
 
             HttpWebRequest request = GetRequest(AUTH_SERVER + TOKEN_URL);
             request.ContentType = "application/x-www-form-urlencoded";
@@ -155,15 +161,16 @@ namespace CAPI
 
                     if (Credentials.accessToken == null)
                     {
-                        Logout();
+                        LogOut();
                         throw new EliteDangerousCompanionAppAuthenticationException("Access token not found");
                     }
 
                     CurrentState = State.Authorized;
+                    StatusChange?.Invoke(State.RefreshSucceeded);
                 }
                 else
                 {
-                    Logout();
+                    LogOut();
                     throw new EliteDangerousCompanionAppAuthenticationException("Invalid refresh token");
                 }
             }
@@ -171,8 +178,6 @@ namespace CAPI
 
         private void AskForLogin()      
         {
-            CurrentState = State.AwaitingCallback;
-
             RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
 
             byte[] rawVerifier = new byte[32];
@@ -189,9 +194,12 @@ namespace CAPI
 
                                                                             // issue the request to frontier with the required audience, scope, client id
                                                                             // code challenge, authsessioID and the URI to call back on
-            string CALLBACK_URL = $"{uri}://auth/";
+            string CALLBACK_URL = $"{URI}://auth/";
             string webURL = $"{AUTH_SERVER}{AUTH_URL}" + $"?response_type=code&{AUDIENCE}&{SCOPE}&client_id={clientID}&code_challenge={codeChallenge}&code_challenge_method=S256&state={authSessionID}&redirect_uri={Uri.EscapeDataString(CALLBACK_URL)}";
             Process.Start(webURL);
+
+            CurrentState = State.AwaitingCallback;
+            StatusChange?.Invoke(CurrentState);
         }
 
         // DDE server calls this with the URL callback
@@ -201,7 +209,7 @@ namespace CAPI
         {
             try
             {
-                string CALLBACK_URL = $"{uri}://auth/";
+                string CALLBACK_URL = $"{URI}://auth/";
 
                 // verify the callback url is ours, and contains parameters
 
@@ -282,6 +290,7 @@ namespace CAPI
                         }
 
                         CurrentState = State.Authorized;
+                        StatusChange?.Invoke(CurrentState);
                     }
                     else
                     {
@@ -292,6 +301,7 @@ namespace CAPI
             }
             catch (Exception)
             {
+                StatusChange?.Invoke(State.AuthorizationFailed);
                 CurrentState = State.LoggedOut;
             }
         }
@@ -442,7 +452,7 @@ namespace CAPI
             request.AllowAutoRedirect = true;
             request.Timeout = 10000;
             request.ReadWriteTimeout = 10000;
-            request.UserAgent = useragent;
+            request.UserAgent = UserAgentNameVersion;
             if (CurrentState == State.Authorized)
             {
                 request.Headers["Authorization"] = $"Bearer {Credentials.accessToken}";
@@ -505,9 +515,6 @@ namespace CAPI
         private static readonly string SHIPYARD_URL = "/shipyard";
 
         private readonly string clientID; // we are not allowed to check the client ID into version control or publish it to 3rd parties
-
-        private string uri;
-        private string useragent;
 
         private string cachedProfile;
         private DateTime cachedProfileExpires;
