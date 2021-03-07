@@ -64,8 +64,11 @@ namespace CAPI
 
         public void Save()
         {
-            JObject jo = JToken.FromObject(this).Object();
-            File.WriteAllText(savedPath, jo.ToString());
+            if (savedPath != null)
+            {
+                JObject jo = JToken.FromObject(this).Object();
+                File.WriteAllText(savedPath, jo.ToString());
+            }
         }
 
     }

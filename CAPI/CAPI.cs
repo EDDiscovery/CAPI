@@ -113,14 +113,21 @@ namespace CAPI
             return true;        // everything is ok, either we have logged in, or we are in the process of asking the user for a login
         }
 
+        // Disconnect the user from this class - credential file is unaffected.  Can call before login
+        public void Disconnect()
+        {
+            Credentials?.Clear();
+            CurrentState = State.LoggedOut;
+            cachedProfile = null;
+            User = null;
+            StatusChange?.Invoke(CurrentState);
+        }
+
         // Log out of the companion API and remove local credentials
         public void LogOut()
         {
-            Credentials.Clear();
-            Credentials.Save();
-            CurrentState = State.LoggedOut;
-            cachedProfile = null;
-            StatusChange?.Invoke(CurrentState);
+            Disconnect();
+            Credentials?.Save();     // if we had a credential file, then clear them in the file
         }
 
         // throws web exception, or AuthenticationException (logs you out).  Else its got the access token and your good to go
@@ -333,7 +340,7 @@ namespace CAPI
         {
             if (!forceRefresh && cachedProfile != null && cachedProfileExpires > DateTime.UtcNow)
             {
-                System.Diagnostics.Debug.WriteLine("Returning cached profile");
+                //System.Diagnostics.Debug.WriteLine("Returning cached profile");
             }
             else
             {
@@ -425,22 +432,22 @@ namespace CAPI
                     ? Encoding.UTF8
                     : Encoding.GetEncoding(response.CharacterSet ?? string.Empty);
 
-            System.Diagnostics.Debug.WriteLine("Reading response");
             using (var stream = response.GetResponseStream())
             {
                 if (stream == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("No response stream");
+                    System.Diagnostics.Debug.WriteLine("CAPI No response stream");
                     return null;
                 }
                 var reader = new StreamReader(stream, encoding);
                 string data = reader.ReadToEnd();
                 if (string.IsNullOrEmpty(data) || data.Trim() == "")
                 {
-                    System.Diagnostics.Debug.WriteLine("No data returned");
+                    System.Diagnostics.Debug.WriteLine("CAPI No data returned");
                     return null;
                 }
-                System.Diagnostics.Debug.WriteLine("Data is " + data);
+
+                //System.Diagnostics.Debug.WriteLine("CAPI Data is " + data);
                 return data;
             }
         }
@@ -471,10 +478,9 @@ namespace CAPI
             }
             catch (WebException wex)
             {
-                System.Diagnostics.Debug.WriteLine("Failed to obtain response, error code " + wex.Status);
+                System.Diagnostics.Debug.WriteLine("CAPI Failed to obtain response, error code " + wex.Status);
                 return null;
             }
-            System.Diagnostics.Debug.WriteLine("Response is " );
             return response;
         }
 
