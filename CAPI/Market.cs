@@ -61,6 +61,8 @@ namespace CAPI
             }
         }
 
+        public JArray Commodities { get { return json["commodities"].Array(); } }
+
         public class Commodity
         {
             public long ID;
