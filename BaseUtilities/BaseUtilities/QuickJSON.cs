@@ -410,15 +410,14 @@ namespace BaseUtils.JSON
             }
         }
 
-#endregion
+        #endregion
 
-#region Operators and functions
+        #region Operators and functions
 
-        // if called on a non indexed object, return JNotPresent().  
-        // On an Array/Object, will return JNotPresent if not present, or indexer is not right type
+        // if called on a non indexed object, throws
+        // On an Array/Object, get return null if not present, or indexer is not right type
+        // On an Array/Object, set will throw if indexer is not of right type or index out of range (Arrays)
         public virtual JToken this[object key] { get { return null; } set { throw new NotImplementedException(); } }
-
-        public virtual JToken Contains(string[] ids) { throw new NotImplementedException(); } // lookup one of these keys in a JObject
 
         public IEnumerator<JToken> GetEnumerator()
         {

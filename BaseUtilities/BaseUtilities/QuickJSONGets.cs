@@ -21,8 +21,8 @@ namespace BaseUtils.JSON
     public static class JTokenExtensionsGet
     {
         // done as extension classes as it allows null to be in tk
-    
-        public static JToken I(this JToken tk, string id)           // safe [] allowing previous to be null
+
+        public static JToken I(this JToken tk, object id)           // safe [] allowing previous to be null
         {
             return tk != null ? tk[id] : null;
         }

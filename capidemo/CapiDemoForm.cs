@@ -50,6 +50,7 @@ namespace CAPIDemo
 
             capi = new CompanionAPI(@"c:\code", CapiClientIdentity.id, $"EDCD-Program-1.2.3.4", uri);
 
+            dateTimePicker.Value = DateTime.UtcNow;
         }
 
         private void handleCallbackUrl(IntPtr hurl)
@@ -63,14 +64,14 @@ namespace CAPIDemo
 
         private void buttonLoginOne_Click(object sender, EventArgs e)
         {
-            capi.Login("one", false);
+            capi.LogIn("one");
             richTextBox.Text += "-------------------------" + Environment.NewLine;
             richTextBox.Text += "Login One" + Environment.NewLine;
         }
 
         private void buttonLoginTwo_Click(object sender, EventArgs e)
         {
-            capi.Login("two:user", false);
+            capi.LogIn("two:user");
             richTextBox.Text += "-------------------------" + Environment.NewLine;
             richTextBox.Text += "Login Two" + Environment.NewLine;
         }
@@ -120,8 +121,8 @@ namespace CAPIDemo
 
         private void buttonLogout_Click(object sender, EventArgs e)
         {
-            if (!capi.LoggedOut)
-                capi.Logout();
+            capi.LogOut();
+            richTextBox.Text += "Logout" + Environment.NewLine;
         }
 
         private void buttonMarket_Click(object sender, EventArgs e)
@@ -184,5 +185,24 @@ namespace CAPIDemo
 
         }
 
+        private void buttonjournal_Click(object sender, EventArgs e)
+        {
+            if (capi.Active)
+            {
+                string p = capi.Journal(dateTimePicker.Value, out System.Net.HttpStatusCode status);
+
+                richTextBox.Text += "-------------------------" + Environment.NewLine;
+                richTextBox.Text += "Journal Response " + status +  Environment.NewLine;
+
+                if ( p != null )
+                {
+                    File.WriteAllText(@"c:\code\journal.json", p);
+                }
+
+                richTextBox.Select(richTextBox.Text.Length - 1, 1);
+                richTextBox.ScrollToCaret();
+            }
+
+        }
     }
 }

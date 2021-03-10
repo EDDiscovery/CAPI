@@ -48,7 +48,7 @@ namespace BaseUtils.JSON
         public override JToken this[object key]
         {
             get { if (key is int && (int)key >= 0 && (int)key < Elements.Count) return Elements[(int)key]; else return null; }
-            set { System.Diagnostics.Debug.Assert(key is int && value != null); Elements[(int)key] = value; }
+            set { System.Diagnostics.Debug.Assert(key is int); Elements[(int)key] = (value == null) ? JToken.Null() : value; }
         }
 
         // must be in range.

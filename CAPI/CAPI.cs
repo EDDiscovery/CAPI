@@ -150,38 +150,48 @@ namespace CAPI
                 dataStream.Write(data, 0, data.Length);
             }
 
-            using (HttpWebResponse response = GetResponse(request))
+            try
             {
-                if (response == null)
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 {
-                    throw new EliteDangerousCompanionWebException("Failed to contact API server");
-                }
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        string responseData = getResponseData(response);
+                        JObject json = JObject.Parse(responseData);
+                        Credentials.refreshToken = (string)json["refresh_token"];
+                        Credentials.accessToken = (string)json["access_token"];
+                        Credentials.tokenExpiry = DateTime.UtcNow.AddSeconds((double)json["expires_in"]);
+                        Credentials.Save();
 
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    string responseData = getResponseData(response);
-                    JObject json = JObject.Parse(responseData);
-                    Credentials.refreshToken = (string)json["refresh_token"];
-                    Credentials.accessToken = (string)json["access_token"];
-                    Credentials.tokenExpiry = DateTime.UtcNow.AddSeconds((double)json["expires_in"]);
-                    Credentials.Save();
+                        if (Credentials.accessToken == null)
+                        {
+                            LogOut();
+                            throw new EliteDangerousCompanionAppAuthenticationException("Access token not found");
+                        }
 
-                    if (Credentials.accessToken == null)
+                        CurrentState = State.Authorized;
+                        StatusChange?.Invoke(State.RefreshSucceeded);
+                    }
+                    else
                     {
                         LogOut();
-                        throw new EliteDangerousCompanionAppAuthenticationException("Access token not found");
+                        throw new EliteDangerousCompanionAppAuthenticationException("Invalid refresh token");
                     }
-
-                    CurrentState = State.Authorized;
-                    StatusChange?.Invoke(State.RefreshSucceeded);
-                }
-                else
-                {
-                    LogOut();
-                    throw new EliteDangerousCompanionAppAuthenticationException("Invalid refresh token");
                 }
             }
+            catch (WebException wex)
+            {
+                System.Diagnostics.Debug.WriteLine("CAPI Refresh Web exception " + wex.Status);
+                if (wex.Status == WebExceptionStatus.ProtocolError)         // seen when a bad refresh token is sent to frontier
+                {
+                    LogOut();
+                    throw new EliteDangerousCompanionWebException("Protocol Error");
+                }
+                else
+                    throw new EliteDangerousCompanionWebException("Failed to contact API server " + wex);
+            }
         }
+
 
         private void AskForLogin()      
         {
@@ -273,7 +283,7 @@ namespace CAPI
                 }
 
                 // now get the response
-                using (HttpWebResponse response = GetResponse(request))
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 {
                     if (response?.StatusCode == null)
                     {
@@ -304,7 +314,6 @@ namespace CAPI
                         throw new EliteDangerousCompanionAppAuthenticationException("Invalid refresh token from authorization server");
                     }
                 }
-
             }
             catch (Exception)
             {
@@ -344,7 +353,7 @@ namespace CAPI
             }
             else
             {
-                string v = Get(PROFILE_URL);
+                string v = Get(PROFILE_URL, out HttpStatusCode unused);
                 cachedProfile = v;
 
                 if (cachedProfile != null)
@@ -360,21 +369,52 @@ namespace CAPI
 
         public string Market()
         {
-            return Get(MARKET_URL);
+            return Get(MARKET_URL, out HttpStatusCode unused);
         }
 
         // obtain shipyard end point - may return null
 
         public string Shipyard()
         {
-            return Get(SHIPYARD_URL);
+            return Get(SHIPYARD_URL, out HttpStatusCode unused);
         }
 
-        // will try and get endpoint. Null means a web problem or we are not authorised.
-
-        private string Get(string endpoint)
+        // obtain journal on date
+        // status = OK + string : got
+        // status = PartialContent + string = not all loaded
+        // status = NoContent = nothing on that day
+        // status = ServiceUnavailable/Unauthoriszed - see below
+        
+        public string Journal(DateTime day, out HttpStatusCode status)
         {
-            if (CurrentState != State.Authorized)
+            var s = Get(JOURNAL_URL + "/" + day.ToString("yyyy/MM/dd"), out status);
+            if ( s != null)
+            {
+                // if OK/Jorunal unavailable or empty object, fix output to null, thanks Artie.
+
+                if (status == HttpStatusCode.OK && s.Equals("Journal unavailable", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    s = null;
+                }
+                else if (s == "{}")
+                {
+                    s = null;
+                }
+            }
+
+            return s;
+        }
+
+        // will try and get endpoint. may return null
+        // status = ServiceUnavailable could not get a response
+        // status = Unauthorized = oAuth not working, refresh token not working, or login required
+        // or status code from server
+
+        private string Get(string endpoint, out HttpStatusCode status)
+        {
+            status = HttpStatusCode.Unauthorized;
+
+            if (!Active)
                 return null;
 
             string serverurl = GameIsBeta ? BETA_SERVER : LIVE_SERVER;
@@ -403,20 +443,25 @@ namespace CAPI
 
             HttpWebRequest request = GetRequest(serverurl + endpoint);
 
-            using (HttpWebResponse response = GetResponse(request))
+            try
             {
-                if (response == null)
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 {
-                    System.Diagnostics.Debug.WriteLine("Failed to contact API server");
-                    return null;
-                }
+                    status = response.StatusCode;
 
-                if (response.StatusCode == HttpStatusCode.Found)
-                {
-                    return null;
-                }
+                    if (response.StatusCode == HttpStatusCode.Found)
+                    {
+                        return null;
+                    }
 
-                return getResponseData(response);
+                    return getResponseData(response);
+                }
+            }
+            catch (WebException wex)
+            {
+                status = HttpStatusCode.ServiceUnavailable;
+                System.Diagnostics.Debug.WriteLine("CAPI Failed to obtain response, error code " + wex.Status);
+                return null;
             }
         }
 
@@ -426,11 +471,13 @@ namespace CAPI
          */
         private string getResponseData(HttpWebResponse response)
         {
-            if (response is null) { return null; }
+            if (response is null)
+            {
+                return null;
+            }
+
             // Obtain and parse our response
-            var encoding = response.CharacterSet == ""
-                    ? Encoding.UTF8
-                    : Encoding.GetEncoding(response.CharacterSet ?? string.Empty);
+            var encoding = string.IsNullOrEmpty(response.CharacterSet) ? Encoding.UTF8 : Encoding.GetEncoding(response.CharacterSet ?? string.Empty);
 
             using (var stream = response.GetResponseStream())
             {
@@ -468,28 +515,11 @@ namespace CAPI
             return request;
         }
 
-        // Obtain a response, ensuring that we obtain the response's cookies
-        private HttpWebResponse GetResponse(HttpWebRequest request)
-        {
-            HttpWebResponse response;
-            try
-            {
-                response = (HttpWebResponse)request.GetResponse();
-            }
-            catch (WebException wex)
-            {
-                System.Diagnostics.Debug.WriteLine("CAPI Failed to obtain response, error code " + wex.Status);
-                return null;
-            }
-            return response;
-        }
-
         private string base64UrlEncode(byte[] blob)
         {
             string base64 = Convert.ToBase64String(blob, Base64FormattingOptions.None);
             return base64.Replace('+', '-').Replace('/', '_').Replace("=", "");
         }
-
 
         public static string SafeFileString(string normal)
         {
@@ -512,13 +542,14 @@ namespace CAPI
         private static readonly string AUTH_SERVER = "https://auth.frontierstore.net";
 
         private static readonly string SCOPE = "scope=capi";
-        private static readonly string AUDIENCE = "audience=epic,steam,frontier"; 
+        private static readonly string AUDIENCE = "audience=all"; 
         private static readonly string AUTH_URL = "/auth";      
         private static readonly string TOKEN_URL = "/token";    
 
         private static readonly string PROFILE_URL = "/profile";
         private static readonly string MARKET_URL = "/market";
         private static readonly string SHIPYARD_URL = "/shipyard";
+        private static readonly string JOURNAL_URL = "/journal";
 
         private readonly string clientID; // we are not allowed to check the client ID into version control or publish it to 3rd parties
 

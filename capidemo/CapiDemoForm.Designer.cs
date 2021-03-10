@@ -35,6 +35,8 @@
             this.button4 = new System.Windows.Forms.Button();
             this.buttonShipYard = new System.Windows.Forms.Button();
             this.buttonLoginTwo = new System.Windows.Forms.Button();
+            this.buttonJournal = new System.Windows.Forms.Button();
+            this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.SuspendLayout();
             // 
             // buttonLoginOne
@@ -77,7 +79,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(47, 265);
+            this.button4.Location = new System.Drawing.Point(47, 392);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 2;
@@ -105,19 +107,39 @@
             this.buttonLoginTwo.UseVisualStyleBackColor = true;
             this.buttonLoginTwo.Click += new System.EventHandler(this.buttonLoginTwo_Click);
             // 
-            // CapiDemo
+            // buttonJournal
+            // 
+            this.buttonJournal.Location = new System.Drawing.Point(47, 286);
+            this.buttonJournal.Name = "buttonJournal";
+            this.buttonJournal.Size = new System.Drawing.Size(75, 23);
+            this.buttonJournal.TabIndex = 2;
+            this.buttonJournal.Text = "Journal";
+            this.buttonJournal.UseVisualStyleBackColor = true;
+            this.buttonJournal.Click += new System.EventHandler(this.buttonjournal_Click);
+            // 
+            // dateTimePicker
+            // 
+            this.dateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dateTimePicker.Location = new System.Drawing.Point(21, 260);
+            this.dateTimePicker.Name = "dateTimePicker";
+            this.dateTimePicker.Size = new System.Drawing.Size(101, 20);
+            this.dateTimePicker.TabIndex = 4;
+            // 
+            // CapiDemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1260, 820);
+            this.Controls.Add(this.dateTimePicker);
             this.Controls.Add(this.richTextBox);
             this.Controls.Add(this.button4);
+            this.Controls.Add(this.buttonJournal);
             this.Controls.Add(this.buttonShipYard);
             this.Controls.Add(this.buttonMarket);
             this.Controls.Add(this.buttonProfile);
             this.Controls.Add(this.buttonLoginTwo);
             this.Controls.Add(this.buttonLoginOne);
-            this.Name = "CapiDemo";
+            this.Name = "CapiDemoForm";
             this.Text = "Form1";
             this.ResumeLayout(false);
 
@@ -132,6 +154,8 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button buttonShipYard;
         private System.Windows.Forms.Button buttonLoginTwo;
+        private System.Windows.Forms.Button buttonJournal;
+        private System.Windows.Forms.DateTimePicker dateTimePicker;
     }
 }
 
