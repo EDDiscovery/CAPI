@@ -49,8 +49,8 @@
     <Compile Include="Shipyard.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\BaseUtilities\BaseUtilities\BaseUtils.csproj">
-      <Project>{86fa5950-1f64-4c1e-820d-18d412cb89f2}</Project>
+    <ProjectReference Include="..\BaseUtilities\BaseUtilities\BaseUtils.csproj">
+      <Project>{c657c881-f3e1-45ba-aca5-966348010414}</Project>
       <Name>BaseUtils</Name>
     </ProjectReference>
   </ItemGroup>
