@@ -381,12 +381,26 @@ namespace CAPI
             return Get(SHIPYARD_URL, out HttpStatusCode unused);
         }
 
+        // obtain fleetcarrier end point - may return null
+
+        public string FleetCarrier()
+        {
+            return Get(FLEETCARRIER_URL, out HttpStatusCode unused);
+        }
+
+        // obtain CG end point - may return null
+        
+        public string CommunityGoals()
+        {
+            return Get(COMMUNITYGOALS_URL, out HttpStatusCode unused);
+        }
+
         // obtain journal on date
         // status = OK + string : got
         // status = PartialContent + string = not all loaded
         // status = NoContent = nothing on that day
         // status = ServiceUnavailable/Unauthoriszed - see below
-        
+
         public string Journal(DateTime day, out HttpStatusCode status)
         {
             var s = Get(JOURNAL_URL + "/" + day.ToString("yyyy/MM/dd"), out status);
@@ -555,6 +569,8 @@ namespace CAPI
         private static readonly string MARKET_URL = "/market";
         private static readonly string SHIPYARD_URL = "/shipyard";
         private static readonly string JOURNAL_URL = "/journal";
+        private static readonly string FLEETCARRIER_URL = "/fleetcarrier";
+        private static readonly string COMMUNITYGOALS_URL = "/communitygoals";
 
         private readonly string clientID; // we are not allowed to check the client ID into version control or publish it to 3rd parties
 
