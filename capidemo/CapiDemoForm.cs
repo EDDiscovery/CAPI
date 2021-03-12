@@ -22,6 +22,7 @@ namespace CAPIDemo
         CompanionAPI capi;
         DDEServer ddeserver;
         const string rootpath = @"c:\code\";            // where to dump files
+        const string rootpathnoslash = @"c:\code";            // where to dump files
 
         public CapiDemoForm()
         {
@@ -49,7 +50,7 @@ namespace CAPIDemo
 
             System.Diagnostics.Debug.Assert(CapiClientIdentity.id.Contains("-"));
 
-            capi = new CompanionAPI(@"c:\code", CapiClientIdentity.id, $"EDCD-Program-1.2.3.4", uri);
+            capi = new CompanionAPI(rootpathnoslash, CapiClientIdentity.id, $"EDCD-Program-1.2.3.4", uri);
 
             dateTimePicker.Value = DateTime.UtcNow;
         }
@@ -85,7 +86,7 @@ namespace CAPIDemo
             if (capi.Active)
             {
                 string p = capi.Profile();
-            //    File.WriteAllText(rootpath+"profile.json", p);
+                File.WriteAllText(rootpath+"profile.json", p);
 
                 richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
@@ -133,7 +134,7 @@ namespace CAPIDemo
             if (capi.Active)
             {
                 string p = capi.Market();
-              //  File.WriteAllText(rootpath+"market.json", p);
+                File.WriteAllText(rootpath+"market.json", p);
 
                 richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
@@ -163,7 +164,7 @@ namespace CAPIDemo
             if (capi.Active)
             {
                 string p = capi.Shipyard();
-                //  File.WriteAllText(rootpath+"shipyard.json", p);
+                File.WriteAllText(rootpath+"shipyard.json", p);
                 richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
                 Shipyard sy = new Shipyard(p);
