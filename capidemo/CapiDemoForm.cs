@@ -21,12 +21,13 @@ namespace CAPIDemo
     {
         CompanionAPI capi;
         DDEServer ddeserver;
+        const string rootpath = @"c:\code\";            // where to dump files
 
         public CapiDemoForm()
         {
             InitializeComponent();
             for( int i = 0; i < Environment.GetCommandLineArgs().Length; i++)
-                richTextBox.Text += Environment.GetCommandLineArgs()[i] + Environment.NewLine;
+                richTextBox.AppendText( Environment.GetCommandLineArgs()[i] + Environment.NewLine);
 
             string appPath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
 
@@ -41,7 +42,7 @@ namespace CAPIDemo
                 {
                     if ( ddeserver.Register() )
                     {
-                        richTextBox.Text += "DDE Server setup" + Environment.NewLine;
+                        richTextBox.AppendText( "DDE Server setup" + Environment.NewLine);
                     }
                 }
             }
@@ -56,24 +57,27 @@ namespace CAPIDemo
         private void handleCallbackUrl(IntPtr hurl)
         {
             string url = DDEServer.FromDdeStringHandle(hurl);
-            richTextBox.Text += "URL Callback " + url + Environment.NewLine;
+            richTextBox.AppendText( "URL Callback " + url + Environment.NewLine);
             if (capi != null)
                 capi.URLCallBack(url);
+            richTextBox.ScrollToCaret();
         }
 
 
         private void buttonLoginOne_Click(object sender, EventArgs e)
         {
             capi.LogIn("one");
-            richTextBox.Text += "-------------------------" + Environment.NewLine;
-            richTextBox.Text += "Login One" + Environment.NewLine;
+            richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+            richTextBox.AppendText( "Login One" + Environment.NewLine);
+            richTextBox.ScrollToCaret();
         }
 
         private void buttonLoginTwo_Click(object sender, EventArgs e)
         {
             capi.LogIn("two:user");
-            richTextBox.Text += "-------------------------" + Environment.NewLine;
-            richTextBox.Text += "Login Two" + Environment.NewLine;
+            richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+            richTextBox.AppendText( "Login Two" + Environment.NewLine);
+            richTextBox.ScrollToCaret();
         }
 
         private void buttonProfile_Click(object sender, EventArgs e)
@@ -81,40 +85,39 @@ namespace CAPIDemo
             if (capi.Active)
             {
                 string p = capi.Profile();
-            //    File.WriteAllText(@"c:\code\profile.json", p);
+            //    File.WriteAllText(rootpath+"profile.json", p);
 
-                richTextBox.Text += "-------------------------" + Environment.NewLine;
+                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
                 Profile pf = new Profile(p);
                 if (pf.IsValid)
                 {
-                    richTextBox.Text += "Commander " + pf.Commander + " " + pf.ID + Environment.NewLine;
-                    richTextBox.Text += "Credits " + pf.Credits + Environment.NewLine;
-                    richTextBox.Text += "Combat " + pf.RankCombat + Environment.NewLine;
-                    richTextBox.Text += "Explore " + pf.RankExplore + Environment.NewLine;
+                    richTextBox.AppendText( "Commander " + pf.Commander + " " + pf.ID + Environment.NewLine);
+                    richTextBox.AppendText( "Credits " + pf.Credits + Environment.NewLine);
+                    richTextBox.AppendText( "Combat " + pf.RankCombat + Environment.NewLine);
+                    richTextBox.AppendText( "Explore " + pf.RankExplore + Environment.NewLine);
 
-                    richTextBox.Text += "Starport " + pf.StarPort + Environment.NewLine;
+                    richTextBox.AppendText( "Starport " + pf.StarPort + Environment.NewLine);
                     var srv = pf.StarPortServices;
-                    richTextBox.Text += "Starport Major Faction " + pf.StarPortMajorFaction + Environment.NewLine;
-                    richTextBox.Text += "Starport Minor Faction " + pf.StarPortMinorFaction + Environment.NewLine;
+                    richTextBox.AppendText( "Starport Major Faction " + pf.StarPortMajorFaction + Environment.NewLine);
+                    richTextBox.AppendText( "Starport Minor Faction " + pf.StarPortMinorFaction + Environment.NewLine);
 
 
-                    richTextBox.Text += "Ship " + pf.Ship + Environment.NewLine;
-                    richTextBox.Text += "Name " + pf.ShipName + Environment.NewLine;
-                    richTextBox.Text += "Ident " + pf.ShipIdent + Environment.NewLine;
-                    richTextBox.Text += "Value " + pf.ShipTotalValue + Environment.NewLine;
+                    richTextBox.AppendText( "Ship " + pf.Ship + Environment.NewLine);
+                    richTextBox.AppendText( "Name " + pf.ShipName + Environment.NewLine);
+                    richTextBox.AppendText( "Ident " + pf.ShipIdent + Environment.NewLine);
+                    richTextBox.AppendText( "Value " + pf.ShipTotalValue + Environment.NewLine);
 
                     var ml = pf.GetModules();
                     if (ml != null)
-                        richTextBox.Text += "Modules " + ml.Count + Environment.NewLine;
+                        richTextBox.AppendText( "Modules " + ml.Count + Environment.NewLine);
                     var sh = pf.GetShips();
                     if (sh != null)
-                        richTextBox.Text += "Ships " + sh.Count + Environment.NewLine;
+                        richTextBox.AppendText( "Ships " + sh.Count + Environment.NewLine);
                 }
                 else
-                    richTextBox.Text += "No profile" + Environment.NewLine;
+                    richTextBox.AppendText( "No profile" + Environment.NewLine);
 
-                richTextBox.Select(richTextBox.Text.Length - 1, 1);
                 richTextBox.ScrollToCaret();
             }
         }
@@ -122,7 +125,7 @@ namespace CAPIDemo
         private void buttonLogout_Click(object sender, EventArgs e)
         {
             capi.LogOut();
-            richTextBox.Text += "Logout" + Environment.NewLine;
+            richTextBox.AppendText( "Logout" + Environment.NewLine);
         }
 
         private void buttonMarket_Click(object sender, EventArgs e)
@@ -130,15 +133,15 @@ namespace CAPIDemo
             if (capi.Active)
             {
                 string p = capi.Market();
-              //  File.WriteAllText(@"c:\code\market.json", p);
+              //  File.WriteAllText(rootpath+"market.json", p);
 
-                richTextBox.Text += "-------------------------" + Environment.NewLine;
+                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
                 Market mk = new Market(p);
 
                 if (mk.IsValid)
                 {
-                    richTextBox.Text += mk.Name + " " + mk.ID + " " + mk.Type + Environment.NewLine;
+                    richTextBox.AppendText( mk.Name + " " + mk.ID + " " + mk.Type + Environment.NewLine);
                     var imports = mk.Imports;
                     var exports = mk.Exports;
                     var services = mk.Services;
@@ -146,12 +149,11 @@ namespace CAPIDemo
                     var economies = mk.Economies;
                     var commodities = mk.GetCommodities();
                     if (commodities != null)
-                        richTextBox.Text += "Commds " + commodities.Count + Environment.NewLine;
+                        richTextBox.AppendText( "Commds " + commodities.Count + Environment.NewLine);
                 }
                 else
-                    richTextBox.Text += "No market data" + Environment.NewLine;
+                    richTextBox.AppendText( "No market data" + Environment.NewLine);
 
-                richTextBox.Select(richTextBox.Text.Length - 1, 1);
                 richTextBox.ScrollToCaret();
             }
         }
@@ -161,26 +163,26 @@ namespace CAPIDemo
             if (capi.Active)
             {
                 string p = capi.Shipyard();
-              //  File.WriteAllText(@"c:\code\shipyard.json", p);
-                richTextBox.Text += "-------------------------" + Environment.NewLine;
+                //  File.WriteAllText(rootpath+"shipyard.json", p);
+                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
                 Shipyard sy = new Shipyard(p);
                 if (sy.IsValid)
                 {
-                    richTextBox.Text += sy.Name + " " + sy.ID + " " + sy.Type + Environment.NewLine;
+                    richTextBox.AppendText( sy.Name + " " + sy.ID + " " + sy.Type + Environment.NewLine);
                     var imports = sy.Imports;
                     var exports = sy.Exports;
                     var services = sy.Services;
                     var economies = sy.Economies;
                     var modules = sy.GetModules();
                     if (modules != null)
-                        richTextBox.Text += "Modules " + modules.Count + Environment.NewLine;
+                        richTextBox.AppendText( "Modules " + modules.Count + Environment.NewLine);
                 }
                 else
-                    richTextBox.Text += "No Ship data" + Environment.NewLine;
+                    richTextBox.AppendText( "No Ship data" + Environment.NewLine);
 
-                richTextBox.Select(richTextBox.Text.Length - 1, 1);
                 richTextBox.ScrollToCaret();
+
             }
 
         }
@@ -191,16 +193,55 @@ namespace CAPIDemo
             {
                 string p = capi.Journal(dateTimePicker.Value, out System.Net.HttpStatusCode status);
 
-                richTextBox.Text += "-------------------------" + Environment.NewLine;
-                richTextBox.Text += "Journal Response " + status +  Environment.NewLine;
+                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+                richTextBox.AppendText( "Journal Response " + status + Environment.NewLine);
 
-                if ( p != null )
+                if (p != null)
                 {
-                    File.WriteAllText(@"c:\code\journal.json", p);
+                    File.WriteAllText(rootpath+"journal.json", p);
                 }
 
-                richTextBox.Select(richTextBox.Text.Length - 1, 1);
                 richTextBox.ScrollToCaret();
+            }
+
+        }
+
+        private void buttonFleetCarrier_Click(object sender, EventArgs e)
+        {
+            if (capi.Active)
+            {
+                string p = capi.FleetCarrier();
+
+                richTextBox.AppendText("-------------------------" + Environment.NewLine);
+                richTextBox.AppendText( "Fleet Carrier" + Environment.NewLine);
+
+                if (p != null)
+                {
+                    File.WriteAllText(rootpath+"fleetcarrier.json", p);
+                    richTextBox.AppendText("Response" + p + Environment.NewLine);
+                    richTextBox.ScrollToCaret();
+                }
+                else
+                    richTextBox.AppendText("No Data" + Environment.NewLine);
+            }
+
+        }
+
+        private void buttonCG_Click(object sender, EventArgs e)
+        {
+            if (capi.Active)
+            {
+                string p = capi.CommunityGoals();
+
+                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+
+                if (p != null)
+                {
+                    File.WriteAllText(rootpath+"communitygoals.json", p);
+                    richTextBox.AppendText( "Community Goals" + p + Environment.NewLine);
+                    richTextBox.ScrollToCaret();
+                }
+
             }
 
         }
