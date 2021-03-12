@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="CAPI.cs" />
     <Compile Include="Credentials.cs" />
+    <Compile Include="Journal.cs" />
     <Compile Include="Market.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
