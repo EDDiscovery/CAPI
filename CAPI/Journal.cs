@@ -98,7 +98,7 @@ namespace CAPI
                 }
                 else if (journaljson != null)
                 {
-                    File.WriteAllText(@"c:\code\readjournal.log",journaljson);
+                    //File.WriteAllText(@"c:\code\readjournal.log",journaljson);
 
                     string filename = Path.Combine(storepath, "Journal." + cmdrname.SafeFileString() + "." + todo + ".log");
 
