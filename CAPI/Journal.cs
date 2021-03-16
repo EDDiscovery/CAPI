@@ -14,6 +14,8 @@
  * EDDiscovery is not affiliated with Frontier Developments plc.
  */
 
+ //#define CONSOLETESTHARNESS
+
 using BaseUtils.JSON;
 using System;
 using System.Collections.Generic;
@@ -21,115 +23,194 @@ using System.IO;
 
 namespace CAPI
 {
+    //To reset for test:
+    //Delete From JournalEntries Where CommanderID=9;
+    //Delete From TravelLogUnit Where path="C:\Users\RK\AppData\Local\EDDiscovery\CAPI";
+    //Update Commanders Set Options = "{""CONSOLE"":true}" Where id = 9;
+    //clean out CAPI folder of .logs
+    //set up journal files for each day in c:\code\journal.21-03-13.log
+    //enable
+
+
 
     public partial class CompanionAPI
     {
-        public JToken ManageJournalDownload(JToken settings, string storepath, string cmdrname, ref int refresh)
+        public JObject ManageJournalDownload(JObject lasthistory, string storepath, string cmdrname, TimeSpan checktime, int daysinpast )
         {
-            var history = settings != null ? settings.ToObject<Dictionary<DateTime, string>>() : new Dictionary<DateTime, string>();
+            //System.Diagnostics.Debug.WriteLine("---------------------- Journal console check @ " + DateTime.UtcNow.ToStringZulu());
 
-            var newhistory = new Dictionary<DateTime, string>();
+            JObject newhistory = new JObject();
+            const string datekeyformat = "yyyy-MM-dd";
+            string todo = null;
 
-            for (int day = -20; day <= 0; day++)
+            // Go back and check state of the last days search.. find one to process.  update newhistory with lasthistory 
+            for (int day = -daysinpast; day <= 0; day++)
             {
                 DateTime t = DateTime.UtcNow.AddDays(day).StartOfDay();
-                if (history.TryGetValue(t, out string value))     // we have a record for this day
+                string tname = t.ToString(datekeyformat);
+
+                JToken value = null;
+                lasthistory?.TryGetValue(tname, out value);           // value = null if not got
+
+                if (value != null)
+                    newhistory.Add(tname, value);                   // applicable, copy across
+
+                string state = value.I("S").Str("NotTried");        // state of play
+
+                //System.Diagnostics.Debug.WriteLine(tname + " Journal check: " + value?.ToString());
+
+                if (todo == null)
                 {
-                    newhistory.Add(t, value);                      // lets store it in new history
+                    // either nottried (no record) or in a Check state and not too soon
+                    if (state == "NotTried" || ((state.StartsWith("Check") ) && DateTime.UtcNow - value["T"].DateTimeUTC() >= checktime))   
+                    {
+                        todo = tname;
+                    }
                 }
+            }
 
-                value = null;
+            if (todo != null)          // found one to try
+            {
+                System.Diagnostics.Debug.WriteLine("Journal Check day " + todo + " @ " + DateTime.UtcNow.ToStringZulu());
 
-                if (value == null || value == "partial" || day == 0)  // no history, or partial, or current day
+                string journaljson = null;
+
+#if CONSOLETESTHARNESS
+                string subfile = @"c:\code\journal." + todo + ".log";                   // for the test, we pick up this file for this day
+
+                System.Net.HttpStatusCode status = System.Net.HttpStatusCode.NoContent;
+                if ( File.Exists(subfile))
                 {
-                    if (day == 0 && value != null)
+                    journaljson = File.ReadAllText(subfile);
+                    status = System.Net.HttpStatusCode.OK;
+                }
+#else
+                journaljson = Journal(todo, out System.Net.HttpStatusCode status);      // real code polls CAPI
+#endif
+
+                string dayzeroname = DateTime.UtcNow.StartOfDay().ToString(datekeyformat);     // name of current day in this system
+
+                if (status == System.Net.HttpStatusCode.NoContent)
+                {
+                    // server says no content for the day. If its a previous day, its over. Else we are in check1 continuously because the game might start
+
+                    newhistory[todo] = new JObject() { ["S"] = todo==dayzeroname ? "Check1" : "NoContent", ["T"] = DateTime.UtcNow.ToStringZulu() };
+                }
+                else if (journaljson != null)
+                {
+                    File.WriteAllText(@"c:\code\readjournal.log",journaljson);
+
+                    string filename = Path.Combine(storepath, "Journal." + cmdrname.SafeFileString() + "." + todo + ".log");
+
+                    string prevcontent = null;
+
+                    if (File.Exists(filename))                          // if file there, try and read the lines, and if so, store
                     {
-                        System.Diagnostics.Debug.WriteLine("Day 0 was done, so next check will be a long time");
-                        refresh = 10000;
+                        prevcontent = BaseUtils.FileHelpers.TryReadAllTextFromFile(filename);
                     }
 
-                    System.Diagnostics.Debug.WriteLine("Check day time for " + t);
+                    string samesecondsegment = null;                      
+                    string samesecondtimestamp = "";
+                    string newoutput = "";
 
-                    //string journaljson = Journal(t, out System.Net.HttpStatusCode status);
-
-                    System.Net.HttpStatusCode status = System.Net.HttpStatusCode.OK;
-                    string journaljson = File.ReadAllText(@"c:\code\journal.log");
-
-                    if (status == System.Net.HttpStatusCode.NoContent)
+                    StringReader sr = new StringReader(journaljson);
+                    string curline;
+                    while ((curline = sr.ReadLine()) != null)
                     {
-                        newhistory[t] = "No Content";
-                    }
-                    else if (journaljson != null)
-                    {
-                        //File.WriteAllText(@"c:\code\journal.log",journaljson);
-
-                        string filename = Path.Combine(storepath, "Journal.CAPI." + t.ToString("yy-MM-dd") + ".log");
-
-                        var outfile = new System.Text.StringBuilder();      // where we build the new file
-
-                        var curfilehash = new HashSet<string>();            // hash set, per line, in current file
-
-                        if (File.Exists(filename))                          // if file there, try and read the lines, and if so, 
-                        {
-                            var filelines = BaseUtils.FileHelpers.TryReadAllLinesFromFile(filename);
-                            if (filelines != null)
-                            {
-                                foreach (var l in filelines)                // add all lines to the hash set so we can detect repeats
-                                {
-                                    curfilehash.Add(l);
-                                    outfile.Append(l);                      // and append to the outfile
-                                    outfile.Append(Environment.NewLine);        // Verified this alog works on 12/3/21. Only updates if new lines
-                                }
-                            }
-                        }
-
-                        StringReader sr = new StringReader(journaljson);
-                        string curline;
-                        while( (curline = sr.ReadLine()) != null)
+                        if (curline.HasChars())
                         {
                             JObject ev = JObject.Parse(curline);        // lets sanity check it..
                             if (ev != null && ev.Contains("event") && ev.Contains("timestamp"))     // reject lines which are not valid json records
                             {
                                 string evtype = ev["event"].Str();
                                 if (evtype == "Commander")              // we adjust commander/loadgame commander name to our commander name - so
-                                {                                       // when we scan it it goes into the right history, irrespective of the naming of the commander vs the game
+                                {                                       // when we scan it it goes into the right history, irrespective of the naming of the commander 
+                                                                        // vs the game
                                     ev["Name"] = cmdrname;              // adjust commander name, rewrite again
-                                    curline = ev.ToString();
+                                    curline = ev.ToString(" ");
                                 }
-                                else if (evtype == "LoadGame")          
+                                else if (evtype == "LoadGame")
                                 {
                                     ev["Commander"] = cmdrname;         // adjust commander name, rewrite again
-                                    curline = ev.ToString();
+                                    curline = ev.ToString(" ");
                                 }
 
-                                if ( !curfilehash.Contains(curline))     // if line,adjusted, is not in current file
+                                if (prevcontent == null)              // no previous file, just add
                                 {
-                                    outfile.Append(curline);                // append to output
-                                    outfile.Append(Environment.NewLine);
+                                    newoutput += curline + Environment.NewLine;
                                 }
                                 else
-                                {       // for debugging
+                                {
+                                    // we accumulate all entries with the same second (they cannot be distinguished if events are identical, so can't use a hashset same line check)
+                                    // so that we have a group with the same second, then we see if its in the previous content
+
+                                    string ts = ev["timestamp"].Str();
+
+                                    if (samesecondtimestamp == ts)      // if same timestamp as previous, accumulate
+                                    {
+                                        //System.Diagnostics.Debug.WriteLine("  {0} Same segment {1}", ts, curline.Left(80));
+                                        samesecondsegment += curline + Environment.NewLine;
+                                    }
+                                    else
+                                    {
+                                        if (samesecondsegment == null || prevcontent.Contains(samesecondsegment))      // duplicate segment, ignore
+                                        {
+                                            //  System.Diagnostics.Debug.WriteLine(samesecondsegment != null ? ".. Duplicate data " + ts + " " + samesecondsegment.Left(80): "");
+                                        }
+                                        else
+                                        {
+                                            System.Diagnostics.Debug.WriteLine("  " + ts + " New data");
+                                            System.Diagnostics.Debug.WriteLine(samesecondsegment.LineNumbering(1, "#"));
+                                            newoutput += samesecondsegment;
+                                        }
+
+                                        samesecondsegment = curline + Environment.NewLine;      // start a new timestamp
+                                        samesecondtimestamp = ts;
+                                    }
                                 }
                             }
-                            else
-                            {   // for debugging
-                            }
                         }
+                    }
 
+                    if (samesecondsegment.HasChars() && (prevcontent == null || !prevcontent.Contains(samesecondsegment)))      // clean up last segment
+                    {
+                        System.Diagnostics.Debug.WriteLine("  " + samesecondtimestamp + " New data");
+                        System.Diagnostics.Debug.WriteLine(samesecondsegment.LineNumbering(1, "#"));
+                        newoutput += samesecondsegment;
+                    }
 
-                        System.IO.File.WriteAllText(filename, outfile.ToNullSafeString());
-                        newhistory[t] = status == System.Net.HttpStatusCode.PartialContent ? "Partial" : "Done";
+                    string stateout = "Check1";     // default is to go to check 1 state
+
+                    if (newoutput.HasChars())       // we have new data, so we go into check1 and it will be downloaded again later
+                    {
+                        System.Diagnostics.Debug.WriteLine("..{0} New content for {1}", todo, filename);
+                        System.IO.File.WriteAllText(filename, (prevcontent ?? "") + newoutput);
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("No response to " + t + " will try again");
+                        System.Diagnostics.Debug.WriteLine("..{0} No change for {1}", todo, filename);
+                        string instate = lasthistory[todo].I("S").Str("NotTried");
+
+                        if (instate == "Check1" && todo != dayzeroname)        // 1->2 only if not day0
+                            stateout = "Check2";
+                        else if (instate == "Check2")   // 2->Done
+                            stateout = "Done";          // otherwise 1
                     }
 
-                    break;
+                    newhistory[todo] = new JObject() { ["S"] = stateout, ["T"] = DateTime.UtcNow.ToStringZulu() };        // no new data, mark done.
+
+                    System.Diagnostics.Debug.WriteLine(".. to state " + newhistory[todo].ToString());
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("  No response to " + todo + " will try again");
                 }
             }
 
-            return JToken.FromObject(newhistory);
+            //System.Diagnostics.Debug.WriteLine("--------------- finished " + newhistory.ToString());
+
+            return newhistory;
         }
     }
 }
+

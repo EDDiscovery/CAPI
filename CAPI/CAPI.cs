@@ -77,6 +77,19 @@ namespace CAPI
             return false;
         }
 
+        // log out for specific user
+
+        public void LogOut(string username)
+        {
+            string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
+            if (File.Exists(credfile))
+            {
+                var credentials = CompanionAppCredentials.Load(credfile);
+                credentials.Clear();
+                credentials.Save();
+            }
+        }
+
         // login for user, we can login over another user
         // returns true if operating okay (may be performing user login) or false if can't log in
 
@@ -403,7 +416,12 @@ namespace CAPI
 
         public string Journal(DateTime day, out HttpStatusCode status)
         {
-            var s = Get(JOURNAL_URL + "/" + day.ToString("yyyy/MM/dd"), out status);
+            return Journal(day.ToString("yyyy/MM/dd"),out status);
+        }
+
+        public string Journal(string date, out HttpStatusCode status)       // date is in yyyy/mm/dd or yyyy-mm-dd format
+        {
+            var s = Get(JOURNAL_URL + "/" + date.Replace("-","/") , out status);
             if ( s != null)
             {
                 // if OK/Jorunal unavailable or empty object, fix output to null, thanks Artie.
