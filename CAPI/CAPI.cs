@@ -28,7 +28,7 @@ using BaseUtils.JSON;
 
 namespace CAPI
 {
-    public class CompanionAPI
+    public partial class CompanionAPI
     {
         public enum State
         {
@@ -77,6 +77,19 @@ namespace CAPI
             return false;
         }
 
+        // log out for specific user
+
+        public void LogOut(string username)
+        {
+            string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
+            if (File.Exists(credfile))
+            {
+                var credentials = CompanionAppCredentials.Load(credfile);
+                credentials.Clear();
+                credentials.Save();
+            }
+        }
+
         // login for user, we can login over another user
         // returns true if operating okay (may be performing user login) or false if can't log in
 
@@ -100,7 +113,7 @@ namespace CAPI
             {
                 RefreshToken();
             }
-            catch ( EliteDangerousCompanionWebException ws)                 // web exceptions, they happen. don't lost the refresh token over it
+            catch (EliteDangerousCompanionWebException ws)                 // web exceptions, they happen. don't lost the refresh token over it
             {
                 System.Diagnostics.Debug.WriteLine(ws);
                 return false;
@@ -191,7 +204,6 @@ namespace CAPI
                     throw new EliteDangerousCompanionWebException("Failed to contact API server " + wex);
             }
         }
-
 
         private void AskForLogin()      
         {
@@ -339,9 +351,12 @@ namespace CAPI
             return paramsDict;
         }
 
-        // all of the three endpoints may:
+        // all of the endpoints may:
         //   may return null if frontier is not available, or the data failed to be retreived
         //   may cause a logout/askforlogin because of the above
+        // all are thread safe
+
+        // check on Active before calling- thats a single variable which should be thread safe 
 
         // obtain profile end point - we cache it for 30 seconds to reduce requests.  May return null if not available
 
@@ -354,7 +369,7 @@ namespace CAPI
             else
             {
                 string v = Get(PROFILE_URL, out HttpStatusCode unused);
-                cachedProfile = v;
+                cachedProfile = v;                                                  // single point set, should be thread safe.
 
                 if (cachedProfile != null)
                 {
@@ -401,7 +416,12 @@ namespace CAPI
 
         public string Journal(DateTime day, out HttpStatusCode status)
         {
-            var s = Get(JOURNAL_URL + "/" + day.ToString("yyyy/MM/dd"), out status);
+            return Journal(day.ToString("yyyy/MM/dd"),out status);
+        }
+
+        public string Journal(string date, out HttpStatusCode status)       // date is in yyyy/mm/dd or yyyy-mm-dd format
+        {
+            var s = Get(JOURNAL_URL + "/" + date.Replace("-","/") , out status);
             if ( s != null)
             {
                 // if OK/Jorunal unavailable or empty object, fix output to null, thanks Artie.
@@ -426,56 +446,59 @@ namespace CAPI
 
         private string Get(string endpoint, out HttpStatusCode status)
         {
-            status = HttpStatusCode.Unauthorized;
-
-            if (!Active)
-                return null;
-
-            string serverurl = GameIsBeta ? BETA_SERVER : LIVE_SERVER;
-
-            if (Credentials.Expired )
+            lock (Credentials)          // we lock here so two threads can't alter the login/credientials at the same time
             {
-                try
-                {
-                    RefreshToken();     
-                }
-                catch (EliteDangerousCompanionWebException ws)
-                {
-                    System.Diagnostics.Debug.WriteLine(ws);
+                status = HttpStatusCode.Unauthorized;
+
+                if (!Active)
                     return null;
-                }
-                catch (Exception ex)        // any other and we are logged out
+
+                string serverurl = GameIsBeta ? BETA_SERVER : LIVE_SERVER;
+
+                if (Credentials.Expired)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex);
-                    AskForLogin();          // ask for a login
-                    return null;
-                }
-            }
-
-            // we have access..
-            System.Diagnostics.Debug.Assert(CurrentState == State.Authorized);
-
-            HttpWebRequest request = GetRequest(serverurl + endpoint);
-
-            try
-            {
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                {
-                    status = response.StatusCode;
-
-                    if (response.StatusCode == HttpStatusCode.Found)
+                    try
                     {
+                        RefreshToken();
+                    }
+                    catch (EliteDangerousCompanionWebException ws)
+                    {
+                        System.Diagnostics.Debug.WriteLine(ws);
                         return null;
                     }
-
-                    return getResponseData(response);
+                    catch (Exception ex)        // any other and we are logged out
+                    {
+                        System.Diagnostics.Debug.WriteLine(ex);
+                        AskForLogin();          // ask for a login
+                        return null;
+                    }
                 }
-            }
-            catch (WebException wex)
-            {
-                status = HttpStatusCode.ServiceUnavailable;
-                System.Diagnostics.Debug.WriteLine("CAPI Failed to obtain response, error code " + wex.Status);
-                return null;
+
+                // we have access..
+                System.Diagnostics.Debug.Assert(CurrentState == State.Authorized);
+
+                HttpWebRequest request = GetRequest(serverurl + endpoint);
+
+                try
+                {
+                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    {
+                        status = response.StatusCode;
+
+                        if (response.StatusCode == HttpStatusCode.Found)
+                        {
+                            return null;
+                        }
+
+                        return getResponseData(response);
+                    }
+                }
+                catch (WebException wex)
+                {
+                    status = HttpStatusCode.ServiceUnavailable;
+                    System.Diagnostics.Debug.WriteLine("CAPI Failed to obtain response, error code " + wex.Status);
+                    return null;
+                }
             }
         }
 
