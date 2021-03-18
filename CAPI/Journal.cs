@@ -71,7 +71,7 @@ namespace CAPI
 
             if (todo != null)          // found one to try
             {
-                System.Diagnostics.Debug.WriteLine("Journal Check day " + todo + " @ " + DateTime.UtcNow.ToStringZulu());
+                System.Diagnostics.Trace.WriteLine("Journal Check day " + todo + " @ " + DateTime.UtcNow.ToStringZulu());
 
                 string journaljson = null;
 
@@ -183,12 +183,12 @@ namespace CAPI
 
                     if (newoutput.HasChars())       // we have new data, so we go into check1 and it will be downloaded again later
                     {
-                        System.Diagnostics.Debug.WriteLine("..{0} New content for {1}", todo, filename);
+                        System.Diagnostics.Trace.WriteLine(string.Format("..{0} New content for {1}", todo, filename));
                         System.IO.File.WriteAllText(filename, (prevcontent ?? "") + newoutput);
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("..{0} No change for {1}", todo, filename);
+                        System.Diagnostics.Trace.WriteLine(string.Format("..{0} No change for {1}", todo, filename));
                         string instate = lasthistory[todo].I("S").Str("NotTried");
 
                         if (instate == "Check1" && todo != dayzeroname)        // 1->2 only if not day0
@@ -199,11 +199,11 @@ namespace CAPI
 
                     newhistory[todo] = new JObject() { ["S"] = stateout, ["T"] = DateTime.UtcNow.ToStringZulu() };        // no new data, mark done.
 
-                    System.Diagnostics.Debug.WriteLine(".. to state " + newhistory[todo].ToString());
+                    System.Diagnostics.Trace.WriteLine(".. to state " + newhistory[todo].ToString());
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("  No response to " + todo + " will try again");
+                    System.Diagnostics.Trace.WriteLine("  No response to " + todo + " will try again");
                 }
             }
 
