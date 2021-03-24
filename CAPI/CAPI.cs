@@ -63,31 +63,42 @@ namespace CAPI
         }
 
         // is the user credential file present, and if so, has it tokens so its been logged in
-        // otherwise, we are either logged out (crediential file present but empty) or never logged in
 
-        public bool HasUserBeenLoggedIn(string username)
+        public enum UserState { NeverLoggedIn, HasLoggedIn, HasLoggedInWithCredentials };
+
+        public UserState GetUserState(string username)
         {
             string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
             if (File.Exists(credfile))
             {
                 var credentials = CompanionAppCredentials.Load(credfile);
-                return credentials.IsAccessRefreshTokenPresent;
+                return credentials.IsAccessRefreshTokenPresent ? UserState.HasLoggedInWithCredentials : UserState.HasLoggedIn;
             }
-
-            return false;
+            else
+                return UserState.NeverLoggedIn;
         }
 
-        // log out for specific user
+        // log out for specific user, true if user existed and logged out. Removes credential file
 
-        public void LogOut(string username)
+        public bool LogOut(string username)
         {
             string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
             if (File.Exists(credfile))
             {
-                var credentials = CompanionAppCredentials.Load(credfile);
-                credentials.Clear();
-                credentials.Save();
+                try
+                {
+                    if ( User == username)      // if we are doing it to ourselved, logout
+                        LogOut();
+
+                    File.Delete(credfile);
+                    return true;
+                }
+                catch( Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("CAPI Logout exception" + ex);
+                }
             }
+            return false;
         }
 
         // login for user, we can login over another user
@@ -136,7 +147,7 @@ namespace CAPI
             StatusChange?.Invoke(CurrentState);
         }
 
-        // Log out of the companion API and remove local credentials
+        // Log out of the companion API and clear local credentials
         public void LogOut()
         {
             Disconnect();
