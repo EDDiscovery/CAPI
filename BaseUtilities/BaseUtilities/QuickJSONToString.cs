@@ -20,7 +20,7 @@ using System.Collections.Generic;
 
 namespace BaseUtils.JSON
 {
-    public partial class JToken 
+    public partial class JToken
     {
         public override string ToString()   // back to JSON form
         {
@@ -32,12 +32,21 @@ namespace BaseUtils.JSON
             return ToString(this, "", "", "", true);
         }
 
-        public string ToString(bool verbose = false, string pad = "  ")
+        public string ToString(bool verbose = false, string oapad = "  ")           // verbose, if so, oapad is configurable
         {
-            return verbose ? ToString(this, "", "\r\n", pad, false) : ToString(this, "", "", "", false);
+            return verbose ? ToString(this, "", "\r\n", oapad, false) : ToString(this, "", "", "", false);
         }
 
-        public static string ToString(JToken o, string prepad, string postpad, string pad, bool stringliterals)
+        public string ToString(string oapad)            // not verbose, but prefix in from of obj/array is configuration
+        {
+            return ToString(this, "", "", oapad, false);
+        }
+
+        // prepad = padding before value, or padding before { or [
+        // postpad = passing after value, or padding after } or ]
+        // oadpad = additonal text to add to prepad for objects/arrays
+
+        public static string ToString(JToken o, string prepad, string postpad, string oapad, bool stringliterals)
         {
             if (o.TokenType == TType.String)
             {
@@ -63,12 +72,12 @@ namespace BaseUtils.JSON
             else if (o.TokenType == TType.Array)
             {
                 string s = prepad + "[" + postpad;
-                string prepad1 = prepad + pad;
+                string arrpad = prepad + oapad;
                 JArray ja = o as JArray;
                 for (int i = 0; i < ja.Count; i++)
                 {
                     bool notlast = i < ja.Count - 1;
-                    s += ToString(ja[i], prepad1, postpad, pad, stringliterals);
+                    s += ToString(ja[i], arrpad, postpad, oapad, stringliterals);
                     if (notlast)
                     {
                         s = s.Substring(0, s.Length - postpad.Length) + "," + postpad;
@@ -80,7 +89,7 @@ namespace BaseUtils.JSON
             else if (o.TokenType == TType.Object)
             {
                 string s = prepad + "{" + postpad;
-                string prepad1 = prepad + pad;
+                string objpad = prepad + oapad;
                 int i = 0;
                 JObject jo = ((JObject)o);
                 foreach (var e in jo)
@@ -88,8 +97,8 @@ namespace BaseUtils.JSON
                     bool notlast = i++ < jo.Count - 1;
                     if (e.Value is JObject || e.Value is JArray)
                     {
-                        s += prepad1 + "\"" + e.Key.EscapeControlCharsFull() + "\":" + postpad;
-                        s += ToString(e.Value, prepad1, postpad, pad, stringliterals);
+                        s += objpad + "\"" + e.Key.EscapeControlCharsFull() + "\":" + postpad;
+                        s += ToString(e.Value, objpad, postpad, oapad, stringliterals);
                         if (notlast)
                         {
                             s = s.Substring(0, s.Length - postpad.Length) + "," + postpad;
@@ -97,7 +106,7 @@ namespace BaseUtils.JSON
                     }
                     else
                     {
-                        s += prepad1 + "\"" + e.Key.EscapeControlCharsFull() + "\":" + ToString(e.Value, "", "", pad, stringliterals) + (notlast ? "," : "") + postpad;
+                        s += objpad + "\"" + e.Key.EscapeControlCharsFull() + "\":" + ToString(e.Value, "", "", oapad, stringliterals) + (notlast ? "," : "") + postpad;
                     }
                 }
                 s += prepad + "}" + postpad;
