@@ -87,7 +87,7 @@ namespace CAPI
             {
                 try
                 {
-                    if ( User == username)      // if we are doing it to ourselved, logout
+                    if ( User == username)      // if we are doing it to ourselves, logout
                         LogOut();
 
                     File.Delete(credfile);
@@ -140,11 +140,15 @@ namespace CAPI
         // Disconnect the user from this class - credential file is unaffected.  Can call before login
         public void Disconnect()
         {
+            bool notloggedout = CurrentState != State.LoggedOut;
+
             Credentials?.Clear();
             CurrentState = State.LoggedOut;
             cachedProfile = null;
             User = null;
-            StatusChange?.Invoke(CurrentState);
+
+            if ( notloggedout )       // prevent reporting if currently logged out
+                StatusChange?.Invoke(CurrentState);
         }
 
         // Log out of the companion API and clear local credentials
