@@ -38,6 +38,7 @@ namespace CAPI
         public long Debt { get { return json["commander"].I("debt").Long(0); } }
         public bool Docked { get { return json["commander"].I("docked").Bool(); } }
         public int ShipID { get { return json["commander"].I("currentShipId").Int(-1); } }
+        public bool OnFoot { get { return json["commander"].I("onfoot").Bool(); } } // odyssey
         public int RankCombat { get { return json["commander"].I("rank").I("combat").Int(-1); } }
         public int RankTrade { get { return json["commander"].I("rank").I("trade").Int(-1); } }
         public int RankExplore { get { return json["commander"].I("rank").I("explore").Int(-1); } }
@@ -47,17 +48,20 @@ namespace CAPI
         public int RankFederation { get { return json["commander"].I("rank").I("federation").Int(-1); } }
         public int RankPower { get { return json["commander"].I("rank").I("power").Int(-1); } }
         public int RankCQC { get { return json["commander"].I("rank").I("cqc").Int(-1); } }
-
+        public int RankSoldier { get { return json["commander"].I("rank").I("soldier").Int(-1); } } // odyssey
+        public int RankExoBiologist { get { return json["commander"].I("rank").I("exobiologist").Int(-1); } } // odyssey
+      
         public bool CobraMkIV { get { return json["commander"].I("capabilities").I("AllowCobraMkIV").Bool(); } }
         public bool Horizons { get { return json["commander"].I("capabilities").I("Horizons").Bool(); } }
+        public bool Odyssey { get { return json["commander"].I("capabilities").I("Odyssey").Bool(); } } // odyssey
 
-        // System
+        // Last System
 
         public string System { get { return json.I("lastSystem").I("name").StrNull(); } }
         public long SystemAddress { get { return json.I("lastSystem").I("id").Long(); } }
         public string SystemMajorFaction { get { return json.I("lastSystem").I("faction").Str("Unknown"); } }
 
-        // Starport ( check docked)
+        // Last Starport (check docked)
 
         public string StarPort { get { return json.I("lastStarport").I("name").StrNull(); } }
         public long StarPortID { get { return json.I("lastStarport").I("id").Long(); } }
@@ -81,7 +85,7 @@ namespace CAPI
         public long ShipIntegrity { get { return json.I("ship").I("value").I("integrity").Long(); } }
         public long ShipPaintwork { get { return json.I("ship").I("value").I("paintwork").Long(); } }
         public bool ShipCockpitBreached { get { return json.I("ship").I("cockpitBreached").Bool(); } }
-        public double OxygenRemaining { get { return json.I("ship").I("oxygenRemaining").Long(); } }        // don't know quantities
+        public double ShipOxygenRemaining { get { return json.I("ship").I("oxygenRemaining").Long(); } }        // don't know quantities
 
         public class Module
         {
@@ -131,6 +135,8 @@ namespace CAPI
             }
             return null;
         }
+
+        // Ships
 
         public class ShipInfo
         {
@@ -183,6 +189,139 @@ namespace CAPI
             }
             return null;
         }
+
+        // suit
+
+        public string SuitName { get { return json.I("suit").I("name").StrNull(); } }
+        public string SuitLocName { get { return json.I("suit").I("locName").StrNull(); } }
+        public long SuitId { get { return json.I("suit").I("id").Long(); } }
+        public long SuitSuitId { get { return json.I("suit").I("suitId").Long(); } }
+        public double SuitHealth { get { return json.I("suit").I("state").I("health").I("hull").Double()/10000.0; } }
+        // tbd slot unknown
+
+        // Loadouts
+
+        public class SuitSlot
+        {
+            public string SlotName;
+            public string Name;
+            public string LocName;
+            public string LocDescription;
+            public long ID;
+            public long WeaponRackID;
+
+            // additional info only in Current Loadout
+
+            public double Health;       // %
+            public long Value;
+            public bool Free;
+            public int AmmoClip;
+            public int HopperSize;
+        }
+
+        public class SuitLoadout
+        {
+            public long LoadoutID;
+            public long SuitID;
+            public string SuitName;
+            public string SuitLocName;
+            public string UserLoadoutName;
+            public List<SuitSlot> slots;
+        }
+
+        public List<SuitLoadout> GetSuitLoadouts()
+        {
+            JArray loadouts = json.I("loadouts").Array();
+            if (loadouts != null)
+            {
+                var list = new List<SuitLoadout>();
+                foreach (var obj in loadouts)
+                {
+                    JObject data = obj.Object();
+                    if (data != null)
+                    {
+                        SuitLoadout m = new SuitLoadout()
+                        {
+                            SuitID = data["suit"].I("suitId").Long(),
+                            SuitName = data["suit"].I("name").Str(),
+                            SuitLocName = data["suit"].I("locName").Str(),
+                            LoadoutID = data["id"].Long(),
+                            UserLoadoutName = data["name"].Str()
+                        };
+
+                        JObject slots = data["slots"].Object();
+
+                        if ( slots != null )
+                        {
+                            m.slots = new List<SuitSlot>();
+                            foreach( var kvp in slots)
+                            {
+                                var sl = new SuitSlot()
+                                {
+                                    SlotName = kvp.Key,
+                                    Name = kvp.Value["name"].Str(),
+                                    LocName = kvp.Value["locName"].Str(),
+                                    LocDescription = kvp.Value["locDescription"].Str(),
+                                    ID = kvp.Value["id"].Long(),
+                                    WeaponRackID = kvp.Value["weaponrackId"].Long()
+                                };
+
+                                m.slots.Add(sl);
+                            }
+                        }
+
+                        list.Add(m);
+                    }
+                }
+
+                return list;
+            }
+            return null;
+        }
+
+        // loadout 
+        // (loadout:suit replicates suit)
+
+        public int LoadoutIndex { get { return json["loadout"].I("loadoutSlotId").Int(-1); } }     // current entry in Loadouts in use (2 = third entry)
+        public string LoadoutUserName { get { return json["loadout"].I("name").StrNull(); } }
+        public double LoadoutOxygenRemaining { get { return json["loadout"].I("state").I("oxygenRemaining").Double() / 1000; } }
+        public double LoadoutEnergy { get { return json["loadout"].I("state").I("energy").Double(); } }
+
+        public List<SuitSlot> GetSuitCurrentLoadout()
+        {
+            JObject slots = json.I("loadout").I("slots").Object();
+            if (slots != null)
+            {
+                var list = new List<SuitSlot>();
+                foreach (var kvp in slots)
+                {
+                    var sl = new SuitSlot()
+                    {
+                        SlotName = kvp.Key,
+                        Name = kvp.Value["name"].Str(),
+                        LocName = kvp.Value["locName"].Str(),
+                        LocDescription = kvp.Value["locDescription"].Str(),
+                        ID = kvp.Value["id"].Long(),
+                        WeaponRackID = kvp.Value["weaponrackId"].Long(),
+
+                        Health = kvp.Value["health"].Double() / 10000.0,
+                        Value = kvp.Value["value"].Long(),
+                        Free = kvp.Value["free"].Bool(),
+                        AmmoClip = kvp.Value["ammo"].I("clip").Int(),
+                        HopperSize = kvp.Value["ammo"].I("hopper").Int(),
+
+                        // TBD slots, modifications, PaintJob, modifications not understood
+                    };
+
+                    list.Add(sl);
+                }
+
+                return list;
+            }
+            return null;
+        }
+
+        // suits - replicating what you get in Loadouts
 
         private BaseUtils.JSON.JToken json;
     }

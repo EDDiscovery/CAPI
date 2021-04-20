@@ -96,25 +96,72 @@ namespace CAPIDemo
                     richTextBox.AppendText( "Commander " + pf.Commander + " " + pf.ID + Environment.NewLine);
                     richTextBox.AppendText( "Credits " + pf.Credits + Environment.NewLine);
                     richTextBox.AppendText( "Combat " + pf.RankCombat + Environment.NewLine);
-                    richTextBox.AppendText( "Explore " + pf.RankExplore + Environment.NewLine);
+                    richTextBox.AppendText("Explore " + pf.RankExplore + Environment.NewLine);
+                    richTextBox.AppendText("Soldier " + pf.RankSoldier + Environment.NewLine);
+                    richTextBox.AppendText("Exobio " + pf.RankExoBiologist + Environment.NewLine);
+                    richTextBox.AppendText("Odyssey " + pf.Odyssey+ Environment.NewLine);
 
                     richTextBox.AppendText( "Starport " + pf.StarPort + Environment.NewLine);
                     var srv = pf.StarPortServices;
                     richTextBox.AppendText( "Starport Major Faction " + pf.StarPortMajorFaction + Environment.NewLine);
                     richTextBox.AppendText( "Starport Minor Faction " + pf.StarPortMinorFaction + Environment.NewLine);
 
+                    richTextBox.AppendText("Suit " + pf.SuitName + " " + pf.SuitId + " " + pf.SuitHealth + Environment.NewLine);
 
-                    richTextBox.AppendText( "Ship " + pf.Ship + Environment.NewLine);
+                    richTextBox.AppendText("Ship " + pf.Ship + Environment.NewLine);
                     richTextBox.AppendText( "Name " + pf.ShipName + Environment.NewLine);
                     richTextBox.AppendText( "Ident " + pf.ShipIdent + Environment.NewLine);
                     richTextBox.AppendText( "Value " + pf.ShipTotalValue + Environment.NewLine);
 
                     var ml = pf.GetModules();
                     if (ml != null)
-                        richTextBox.AppendText( "Modules " + ml.Count + Environment.NewLine);
+                    {
+                        richTextBox.AppendText("Modules " + ml.Count + Environment.NewLine);
+                        foreach (var m in ml)
+                        {
+                            richTextBox.AppendText(" " + m.Name + " " + m.Value + Environment.NewLine);
+                        }
+                    }
                     var sh = pf.GetShips();
                     if (sh != null)
-                        richTextBox.AppendText( "Ships " + sh.Count + Environment.NewLine);
+                    {
+                        richTextBox.AppendText("Ships " + sh.Count + Environment.NewLine);
+                        foreach (var s in sh)
+                        {
+                            richTextBox.AppendText(" " + s.Name + " C:" + s.Cargo + " S:" + s.Station + Environment.NewLine);
+                        }
+                    }
+
+                    var ld = pf.GetSuitLoadouts();
+                    if (ld != null)
+                    {
+                        richTextBox.AppendText("Suit Loadouts " + ld.Count + Environment.NewLine);
+                        foreach (var s in ld)
+                        {
+                            richTextBox.AppendText(" " + s.LoadoutID + " N:" + s.UserLoadoutName + " SN:" + s.SuitName + "," + s.SuitLocName + " C:" + s.SuitID + Environment.NewLine);
+
+                            if (s.slots != null)
+                            {
+                                foreach (var sl in s.slots)
+                                    richTextBox.AppendText("     " + sl.SlotName + " " + sl.Name + " " + sl.LocName + Environment.NewLine);
+
+                            }
+                        }
+
+                    }
+
+                    var cld = pf.GetSuitCurrentLoadout();
+                    if (cld != null)
+                    {
+                        richTextBox.AppendText("Current Suit Loadouts " + cld.Count + Environment.NewLine);
+                        foreach (var s in cld)
+                        {
+                            richTextBox.AppendText("     " + s.SlotName + " " + s.Name + " " + s.LocName + " " + s.Health + " " + s.Value +" " + s.AmmoClip + " " + s.HopperSize + Environment.NewLine);
+                        }
+                    }
+
+
+
                 }
                 else
                     richTextBox.AppendText( "No profile" + Environment.NewLine);
@@ -150,7 +197,13 @@ namespace CAPIDemo
                     var economies = mk.Economies;
                     var commodities = mk.GetCommodities();
                     if (commodities != null)
-                        richTextBox.AppendText( "Commds " + commodities.Count + Environment.NewLine);
+                    {
+                        richTextBox.AppendText("Commds " + commodities.Count + Environment.NewLine);
+                        foreach (var s in commodities)
+                        {
+                            richTextBox.AppendText(" " + s.Name + " S:" + s.Sell + " B:" + s.Buy + " Stock:" + s.Stock +  Environment.NewLine);
+                        }
+                    }
                 }
                 else
                     richTextBox.AppendText( "No market data" + Environment.NewLine);
@@ -245,6 +298,11 @@ namespace CAPIDemo
 
             }
 
+        }
+
+        private void checkBoxBeta_CheckedChanged(object sender, EventArgs e)
+        {
+            capi.GameIsBeta = checkBoxBeta.Checked;
         }
     }
 }

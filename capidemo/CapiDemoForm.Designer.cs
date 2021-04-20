@@ -39,13 +39,14 @@
             this.dateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.buttonFleetCarrier = new System.Windows.Forms.Button();
             this.buttonCG = new System.Windows.Forms.Button();
+            this.checkBoxBeta = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // buttonLoginOne
             // 
-            this.buttonLoginOne.Location = new System.Drawing.Point(47, 13);
+            this.buttonLoginOne.Location = new System.Drawing.Point(47, 34);
             this.buttonLoginOne.Name = "buttonLoginOne";
-            this.buttonLoginOne.Size = new System.Drawing.Size(75, 23);
+            this.buttonLoginOne.Size = new System.Drawing.Size(75, 28);
             this.buttonLoginOne.TabIndex = 0;
             this.buttonLoginOne.Text = "Login One";
             this.buttonLoginOne.UseVisualStyleBackColor = true;
@@ -53,7 +54,7 @@
             // 
             // buttonProfile
             // 
-            this.buttonProfile.Location = new System.Drawing.Point(47, 116);
+            this.buttonProfile.Location = new System.Drawing.Point(47, 136);
             this.buttonProfile.Name = "buttonProfile";
             this.buttonProfile.Size = new System.Drawing.Size(75, 23);
             this.buttonProfile.TabIndex = 1;
@@ -63,7 +64,7 @@
             // 
             // buttonMarket
             // 
-            this.buttonMarket.Location = new System.Drawing.Point(47, 167);
+            this.buttonMarket.Location = new System.Drawing.Point(47, 187);
             this.buttonMarket.Name = "buttonMarket";
             this.buttonMarket.Size = new System.Drawing.Size(75, 23);
             this.buttonMarket.TabIndex = 2;
@@ -75,13 +76,13 @@
             // 
             this.richTextBox.Location = new System.Drawing.Point(137, 12);
             this.richTextBox.Name = "richTextBox";
-            this.richTextBox.Size = new System.Drawing.Size(1085, 796);
+            this.richTextBox.Size = new System.Drawing.Size(1085, 822);
             this.richTextBox.TabIndex = 3;
             this.richTextBox.Text = "";
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(47, 425);
+            this.button4.Location = new System.Drawing.Point(47, 445);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 2;
@@ -91,7 +92,7 @@
             // 
             // buttonShipYard
             // 
-            this.buttonShipYard.Location = new System.Drawing.Point(47, 216);
+            this.buttonShipYard.Location = new System.Drawing.Point(47, 236);
             this.buttonShipYard.Name = "buttonShipYard";
             this.buttonShipYard.Size = new System.Drawing.Size(75, 23);
             this.buttonShipYard.TabIndex = 2;
@@ -101,9 +102,9 @@
             // 
             // buttonLoginTwo
             // 
-            this.buttonLoginTwo.Location = new System.Drawing.Point(47, 58);
+            this.buttonLoginTwo.Location = new System.Drawing.Point(47, 79);
             this.buttonLoginTwo.Name = "buttonLoginTwo";
-            this.buttonLoginTwo.Size = new System.Drawing.Size(75, 23);
+            this.buttonLoginTwo.Size = new System.Drawing.Size(75, 28);
             this.buttonLoginTwo.TabIndex = 0;
             this.buttonLoginTwo.Text = "Login Two";
             this.buttonLoginTwo.UseVisualStyleBackColor = true;
@@ -111,7 +112,7 @@
             // 
             // buttonJournal
             // 
-            this.buttonJournal.Location = new System.Drawing.Point(47, 286);
+            this.buttonJournal.Location = new System.Drawing.Point(47, 306);
             this.buttonJournal.Name = "buttonJournal";
             this.buttonJournal.Size = new System.Drawing.Size(75, 23);
             this.buttonJournal.TabIndex = 2;
@@ -122,14 +123,14 @@
             // dateTimePicker
             // 
             this.dateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePicker.Location = new System.Drawing.Point(21, 260);
+            this.dateTimePicker.Location = new System.Drawing.Point(21, 280);
             this.dateTimePicker.Name = "dateTimePicker";
             this.dateTimePicker.Size = new System.Drawing.Size(101, 20);
             this.dateTimePicker.TabIndex = 4;
             // 
             // buttonFleetCarrier
             // 
-            this.buttonFleetCarrier.Location = new System.Drawing.Point(47, 326);
+            this.buttonFleetCarrier.Location = new System.Drawing.Point(47, 346);
             this.buttonFleetCarrier.Name = "buttonFleetCarrier";
             this.buttonFleetCarrier.Size = new System.Drawing.Size(75, 23);
             this.buttonFleetCarrier.TabIndex = 2;
@@ -139,7 +140,7 @@
             // 
             // buttonCG
             // 
-            this.buttonCG.Location = new System.Drawing.Point(47, 363);
+            this.buttonCG.Location = new System.Drawing.Point(47, 383);
             this.buttonCG.Name = "buttonCG";
             this.buttonCG.Size = new System.Drawing.Size(75, 23);
             this.buttonCG.TabIndex = 2;
@@ -147,11 +148,23 @@
             this.buttonCG.UseVisualStyleBackColor = true;
             this.buttonCG.Click += new System.EventHandler(this.buttonCG_Click);
             // 
+            // checkBoxBeta
+            // 
+            this.checkBoxBeta.AutoSize = true;
+            this.checkBoxBeta.Location = new System.Drawing.Point(64, 11);
+            this.checkBoxBeta.Name = "checkBoxBeta";
+            this.checkBoxBeta.Size = new System.Drawing.Size(48, 17);
+            this.checkBoxBeta.TabIndex = 5;
+            this.checkBoxBeta.Text = "Beta";
+            this.checkBoxBeta.UseVisualStyleBackColor = true;
+            this.checkBoxBeta.CheckedChanged += new System.EventHandler(this.checkBoxBeta_CheckedChanged);
+            // 
             // CapiDemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1260, 820);
+            this.Controls.Add(this.checkBoxBeta);
             this.Controls.Add(this.dateTimePicker);
             this.Controls.Add(this.richTextBox);
             this.Controls.Add(this.button4);
@@ -166,6 +179,7 @@
             this.Name = "CapiDemoForm";
             this.Text = "Form1";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -182,6 +196,7 @@
         private System.Windows.Forms.DateTimePicker dateTimePicker;
         private System.Windows.Forms.Button buttonFleetCarrier;
         private System.Windows.Forms.Button buttonCG;
+        private System.Windows.Forms.CheckBox checkBoxBeta;
     }
 }
 
