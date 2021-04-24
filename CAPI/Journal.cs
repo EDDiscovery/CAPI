@@ -100,7 +100,7 @@ namespace CAPI
                 {
                     //File.WriteAllText(@"c:\code\readjournal.log",journaljson);
 
-                    string filename = Path.Combine(storepath, "Journal." + cmdrname.SafeFileString() + "." + todo + ".log");
+                    string filename = Path.Combine(storepath, (GameIsBeta ? "JournalBeta." : "Journal.") + cmdrname.SafeFileString() + "." + todo + ".log");
 
                     string prevcontent = null;
 
