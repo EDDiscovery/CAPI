@@ -203,7 +203,7 @@ namespace CAPI
                 }
                 else
                 {
-                    System.Diagnostics.Trace.WriteLine("  No response to " + todo + " will try again");
+                    System.Diagnostics.Trace.WriteLine("  No response to " + todo + " (" + status.ToString() + ") will try again");
                 }
             }
 
