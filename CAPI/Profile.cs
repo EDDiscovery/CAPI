@@ -136,6 +136,50 @@ namespace CAPI
             return null;
         }
 
+        // launch bays
+
+        public class LaunchBay
+        {
+            public string Location;
+            public string SubSlot;
+            public string Name;
+            public string LocName;
+            public int Rebuilds;
+            public string Loadout;
+            public string LoadoutName;
+        }
+
+        public List<LaunchBay> GetLaunchBays()  // may return null
+        {
+            JObject baylist = json.I("ship").I("launchBays").Object();
+            if (baylist != null)
+            {
+                List<LaunchBay> list = new List<LaunchBay>();
+                foreach (var kvpslots in baylist)
+                {
+                    JObject subslots = kvpslots.Value.Object();
+                    foreach (var kvpsubslots in subslots)
+                    {
+                        LaunchBay m = new LaunchBay()
+                        {
+                            Location = kvpslots.Key,
+                            SubSlot = kvpsubslots.Key,
+                            Name = kvpsubslots.Value["name"].Str(),
+                            LocName = kvpsubslots.Value["locName"].Str(),
+                            Rebuilds = kvpsubslots.Value["rebuilds"].Int(),
+                            Loadout = kvpsubslots.Value["loadout"].Str(),
+                            LoadoutName = kvpsubslots.Value["loadoutName"].Str(),
+                        };
+                        list.Add(m);
+                    }
+                }
+
+                return list;
+            }
+            return null;
+        }
+
+
         // Ships
 
         public class ShipInfo
@@ -231,13 +275,13 @@ namespace CAPI
 
         public List<SuitLoadout> GetSuitLoadouts()
         {
-            JArray loadouts = json.I("loadouts").Array();
+            JObject loadouts = json.I("loadouts").Object();
             if (loadouts != null)
             {
                 var list = new List<SuitLoadout>();
-                foreach (var obj in loadouts)
+                foreach (var kvploadouts in loadouts)
                 {
-                    JObject data = obj.Object();
+                    JObject data = kvploadouts.Value.Object();
                     if (data != null)
                     {
                         SuitLoadout m = new SuitLoadout()

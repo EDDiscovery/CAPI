@@ -48,6 +48,8 @@ namespace CAPIDemo
                 }
             }
 
+            Directory.CreateDirectory(rootpathnoslash);
+
             System.Diagnostics.Debug.Assert(CapiClientIdentity.id.Contains("-"));
 
             capi = new CompanionAPI(rootpathnoslash, CapiClientIdentity.id, $"EDCD-Program-1.2.3.4", uri);
@@ -81,12 +83,19 @@ namespace CAPIDemo
             richTextBox.ScrollToCaret();
         }
 
+        private void buttonLogout_Click(object sender, EventArgs e)
+        {
+            capi.LogOut();
+            richTextBox.AppendText("Logout" + Environment.NewLine);
+        }
+
         private void buttonProfile_Click(object sender, EventArgs e)
         {
             if (capi.Active)
             {
                 string p = capi.Profile();
                 File.WriteAllText(rootpath+"profile.json", p);
+                System.Diagnostics.Debug.WriteLine("Profile JSON" + p);
 
                 richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
@@ -120,6 +129,15 @@ namespace CAPIDemo
                         foreach (var m in ml)
                         {
                             richTextBox.AppendText(" " + m.Name + " " + m.Value + Environment.NewLine);
+                        }
+                    }
+                    var lb = pf.GetLaunchBays();
+                    if (lb != null)
+                    {
+                        richTextBox.AppendText("Launch Bays " + lb.Count + Environment.NewLine);
+                        foreach (var m in lb)
+                        {
+                            richTextBox.AppendText(" " + m.Location + ":" + m.SubSlot + " = " + m.LocName + Environment.NewLine);
                         }
                     }
                     var sh = pf.GetShips();
@@ -160,8 +178,7 @@ namespace CAPIDemo
                         }
                     }
 
-
-
+                    richTextBox.AppendText("---------------" + Environment.NewLine);
                 }
                 else
                     richTextBox.AppendText( "No profile" + Environment.NewLine);
@@ -170,18 +187,13 @@ namespace CAPIDemo
             }
         }
 
-        private void buttonLogout_Click(object sender, EventArgs e)
-        {
-            capi.LogOut();
-            richTextBox.AppendText( "Logout" + Environment.NewLine);
-        }
-
         private void buttonMarket_Click(object sender, EventArgs e)
         {
             if (capi.Active)
             {
                 string p = capi.Market();
                 File.WriteAllText(rootpath+"market.json", p);
+                System.Diagnostics.Debug.WriteLine("Market JSON" + p);
 
                 richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
@@ -191,10 +203,40 @@ namespace CAPIDemo
                 {
                     richTextBox.AppendText( mk.Name + " " + mk.ID + " " + mk.Type + Environment.NewLine);
                     var imports = mk.Imports;
+                    if (imports != null)
+                    {
+                        richTextBox.AppendText("Imports" + Environment.NewLine);
+                        foreach (var kvp in imports)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
                     var exports = mk.Exports;
+                    if (exports != null)
+                    {
+                        richTextBox.AppendText("exports" + Environment.NewLine);
+                        foreach (var kvp in exports)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
                     var services = mk.Services;
-                    var prohibit = mk.Prohibited;
+                    if (services != null)
+                    {
+                        richTextBox.AppendText("services" + Environment.NewLine);
+                        foreach (var kvp in services)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
                     var economies = mk.Economies;
+                    if (economies != null)
+                    {
+                        richTextBox.AppendText("economies" + Environment.NewLine);
+                        foreach (var kvp in economies)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
+                    var prohibit = mk.Prohibited;
+                    if (prohibit != null)
+                    {
+                        richTextBox.AppendText("prohibit" + Environment.NewLine);
+                        foreach (var kvp in prohibit)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
                     var commodities = mk.GetCommodities();
                     if (commodities != null)
                     {
@@ -204,9 +246,10 @@ namespace CAPIDemo
                             richTextBox.AppendText(" " + s.Name + " S:" + s.Sell + " B:" + s.Buy + " Stock:" + s.Stock +  Environment.NewLine);
                         }
                     }
+                    richTextBox.AppendText("---------------" + Environment.NewLine);
                 }
                 else
-                    richTextBox.AppendText( "No market data" + Environment.NewLine);
+                    richTextBox.AppendText("No market data" + Environment.NewLine);
 
                 richTextBox.ScrollToCaret();
             }
@@ -218,19 +261,56 @@ namespace CAPIDemo
             {
                 string p = capi.Shipyard();
                 File.WriteAllText(rootpath+"shipyard.json", p);
-                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+                System.Diagnostics.Debug.WriteLine("Ship JSON" + p);
 
+                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
                 Shipyard sy = new Shipyard(p);
                 if (sy.IsValid)
                 {
                     richTextBox.AppendText( sy.Name + " " + sy.ID + " " + sy.Type + Environment.NewLine);
                     var imports = sy.Imports;
+                    if (imports != null)
+                    {
+                        richTextBox.AppendText("Imports" + Environment.NewLine);
+                        foreach (var kvp in imports)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
                     var exports = sy.Exports;
+                    if (exports != null)
+                    {
+                        richTextBox.AppendText("exports" + Environment.NewLine);
+                        foreach (var kvp in exports)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
                     var services = sy.Services;
+                    if (services != null)
+                    {
+                        richTextBox.AppendText("services" + Environment.NewLine);
+                        foreach (var kvp in services)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
                     var economies = sy.Economies;
+                    if (economies != null)
+                    {
+                        richTextBox.AppendText("economies" + Environment.NewLine);
+                        foreach (var kvp in economies)
+                            richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                    }
                     var modules = sy.GetModules();
                     if (modules != null)
-                        richTextBox.AppendText( "Modules " + modules.Count + Environment.NewLine);
+                    {
+                        richTextBox.AppendText("modules" + Environment.NewLine);
+                        foreach (var v in modules)
+                            richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.Category) + Environment.NewLine);
+                    }
+                    var ships = sy.GetShips();
+                    if (ships != null)
+                    {
+                        richTextBox.AppendText("ships" + Environment.NewLine);
+                        foreach (var v in ships)
+                            richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.BaseValue) + Environment.NewLine);
+                    }
+                    richTextBox.AppendText("---------------" + Environment.NewLine);
                 }
                 else
                     richTextBox.AppendText( "No Ship data" + Environment.NewLine);

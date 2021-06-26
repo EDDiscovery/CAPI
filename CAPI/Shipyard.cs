@@ -70,7 +70,7 @@ namespace CAPI
             public long Stock;
         }
 
-        public List<Module> GetModules()
+        public List<Module> GetModules()        // may be null if no shipyard
         {
             JObject moduleslist = json.I("modules").Object();
             if (moduleslist != null)
@@ -88,6 +88,43 @@ namespace CAPI
                             Name = data["name"].Str(),
                             Cost = data["cost"].Long(),
                             Stock = data["stock"].Long(),
+                        };
+
+                        list.Add(m);
+                    }
+
+                }
+
+                return list;
+            }
+            return null;
+        }
+
+        public class Ship
+        {
+            public long ID;
+            public string Name;
+            public long BaseValue;
+            public string SKU;
+        }
+
+        public List<Ship> GetShips()        // may be null if no shipyard
+        {
+            JObject shiplist = json.I("ships").I("shipyard_list").Object();
+            if (shiplist != null)
+            {
+                List<Ship> list = new List<Ship>();
+                foreach (var kvp in shiplist)
+                {
+                    JObject data = kvp.Value.Object();
+                    if (data != null)
+                    {
+                        Ship m = new Ship()
+                        {
+                            ID = data["id"].Long(),
+                            Name = data["name"].Str(),
+                            BaseValue = data["basevalue"].Long(),
+                            SKU = data["sku"].Str(),
                         };
 
                         list.Add(m);
