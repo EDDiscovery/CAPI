@@ -63,7 +63,7 @@ namespace CAPI
 
         // Last Starport (check docked)
 
-        public string StarPort { get { return json.I("lastStarport").I("name").StrNull(); } }
+        public string StarPort { get { return json.I("lastStarport").I("name").StrNull()?.TrimReplaceEnd('+'); } }
         public long StarPortID { get { return json.I("lastStarport").I("id").Long(); } }
         public Dictionary<string, string> StarPortServices { get { return json["lastStarport"].I("services").Object()?.ToObject<Dictionary<string, string>>(); } }
         public string StarPortMajorFaction { get { return json.I("lastStarport").I("faction").StrNull(); } }

@@ -37,7 +37,7 @@ namespace CAPI
         // Commander
 
         public long ID { get { return json["id"].Long(long.MinValue); } }
-        public string Name { get { return json["name"].StrNull(); } }
+        public string Name { get { return json["name"].StrNull()?.TrimReplaceEnd('+'); } }
         public string Type { get { return json["outpostType"].StrNull(); } }
 
         // id name pairs
