@@ -62,6 +62,15 @@ public static class ObjectExtensionsStrings
         return v.ToString(format, System.Globalization.CultureInfo.InvariantCulture);
     }
 
+    // trim, then if it ends with this, trim it
+    public static string TrimReplaceEnd(this string obj, char endreplace)
+    {
+        obj = obj.Trim();
+        int ep = obj.Length - 1;
+        while (ep >= 0 && obj[ep] == endreplace)
+            ep--;
+        return obj.Substring(0, ep + 1);
+    }
 
     public static string ToNullSafeString(this object obj)
     {
