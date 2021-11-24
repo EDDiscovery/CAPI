@@ -47,7 +47,7 @@ namespace CAPI
             for (int day = -daysinpast; day <= 0; day++)
             {
                 DateTime t = DateTime.UtcNow.AddDays(day).StartOfDay();
-                string tname = t.ToString(datekeyformat);
+                string tname = t.ToString(datekeyformat, System.Globalization.CultureInfo.InvariantCulture);
 
                 JToken value = null;
                 lasthistory?.TryGetValue(tname, out value);           // value = null if not got
@@ -88,7 +88,7 @@ namespace CAPI
                 journaljson = Journal(todo, out System.Net.HttpStatusCode status);      // real code polls CAPI
 #endif
 
-                string dayzeroname = DateTime.UtcNow.StartOfDay().ToString(datekeyformat);     // name of current day in this system
+                string dayzeroname = DateTime.UtcNow.StartOfDay().ToString(datekeyformat, System.Globalization.CultureInfo.InvariantCulture);     // name of current day in this system
 
                 if (status == System.Net.HttpStatusCode.NoContent)
                 {

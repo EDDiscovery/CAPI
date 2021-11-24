@@ -431,7 +431,7 @@ namespace CAPI
 
         public string Journal(DateTime day, out HttpStatusCode status)
         {
-            return Journal(day.ToString("yyyy/MM/dd"),out status);
+            return Journal(day.ToString("yyyy/MM/dd", System.Globalization.CultureInfo.InvariantCulture),out status);
         }
 
         public string Journal(string date, out HttpStatusCode status)       // date is in yyyy/mm/dd or yyyy-mm-dd format
