@@ -24,7 +24,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using BaseUtils.JSON;
+using QuickJSON;
 
 namespace CAPI
 {

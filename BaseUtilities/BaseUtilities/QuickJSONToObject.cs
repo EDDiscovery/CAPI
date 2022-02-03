@@ -16,7 +16,7 @@
 
 using System;
 using System.Linq;
-using static BaseUtils.JSON.JToken;
+using static QuickJSONJToken;
 
 namespace BaseUtils.JSON
 {

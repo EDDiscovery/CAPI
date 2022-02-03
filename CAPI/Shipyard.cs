@@ -14,7 +14,7 @@
  * EDDiscovery is not affiliated with Frontier Developments plc.
  */
 
-using BaseUtils.JSON;
+using QuickJSON;
 using System;
 using System.Collections.Generic;
 
@@ -138,6 +138,6 @@ namespace CAPI
         }
 
 
-        private BaseUtils.JSON.JToken json;
+        private QuickJSON.JToken json;
     }
 }
