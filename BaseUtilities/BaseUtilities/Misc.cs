@@ -102,4 +102,13 @@ public static class ObjectExtensionsStrings
     }
 
 
+    public static string ToStringZulu(this DateTime dt)     // zulu warrior format web style
+    {
+        if (dt.Millisecond != 0)
+            return dt.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+        else
+            return dt.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
+
+    }
+
 }
