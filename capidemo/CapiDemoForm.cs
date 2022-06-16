@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CAPI;
+using QuickJSON;
 
 // NOTE you need an enviromental variable called CAPIID set up with your Frontier CAPI ID BEFORE RUNNING visual studio.
 // use the control panel system | Enviromental variables to initialise this
@@ -193,7 +194,11 @@ namespace CAPIDemo
             {
                 string p = capi.Market();
                 File.WriteAllText(rootpath+"market.json", p);
-                System.Diagnostics.Debug.WriteLine("Market JSON" + p);
+                {
+                    JToken t = JToken.Parse(p);
+                    System.Diagnostics.Debug.WriteLine("Market JSON" + t.ToString(true));
+
+                }
 
                 richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
