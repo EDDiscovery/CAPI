@@ -203,6 +203,7 @@ namespace CAPIDemo
                 richTextBox.AppendText( "-------------------------" + Environment.NewLine);
 
                 Market mk = new Market(p);
+                //Market mk = new Market(File.ReadAllText(@"c:\code\logs\capi\market-default(1).json")); // debug
 
                 if (mk.IsValid)
                 {
@@ -242,15 +243,61 @@ namespace CAPIDemo
                         foreach (var kvp in prohibit)
                             richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
                     }
+
                     var commodities = mk.GetCommodities();
                     if (commodities != null)
                     {
                         richTextBox.AppendText("Commds " + commodities.Count + Environment.NewLine);
                         foreach (var s in commodities)
                         {
-                            richTextBox.AppendText(" " + s.Name + " S:" + s.Sell + " B:" + s.Buy + " Stock:" + s.Stock +  Environment.NewLine);
+                            richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " S:" + s.Sell + " B:" + s.Buy + " Stock:" + s.Stock + Environment.NewLine);
                         }
                     }
+                    {
+                        var orderssales = mk.GetOrdersCommoditiesSales();
+                        if (orderssales != null)
+                        {
+                            richTextBox.AppendText("FC Orders for sales " + orderssales.Count + Environment.NewLine);
+                            foreach (var s in orderssales)
+                            {
+                                richTextBox.AppendText("        " + s.Name +  " P:" + s.Price + " Stock:" + s.Stock + Environment.NewLine);
+                            }
+                        }
+                    }
+                    {
+                        var orderspurchases = mk.GetOrdersCommoditiesPurchaces();
+                        if (orderspurchases != null)
+                        {
+                            richTextBox.AppendText("FC Orders for purchases " + orderspurchases.Count + Environment.NewLine);
+                            foreach (var s in orderspurchases)
+                            {
+                                richTextBox.AppendText("        " + s.Name + " T:" + s.Total + " O:" + s.Outstanding + " P:" + s.Price + Environment.NewLine);
+                            }
+                        }
+                    }
+                    {
+                        var ordersmrpurchases = mk.GetOrdersMicroresourcesPurchases();
+                        if (ordersmrpurchases != null)
+                        {
+                            richTextBox.AppendText("FC Orders for MR purchases " + ordersmrpurchases.Count + Environment.NewLine);
+                            foreach (var s in ordersmrpurchases)
+                            {
+                                richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " T:" + s.Total + " O:" + s.Outstanding + " P:" + s.Price + Environment.NewLine);
+                            }
+                        }
+                    }
+                    {
+                        var ordersmrsales = mk.GetOrdersMicroresourcesSales();
+                        if (ordersmrsales != null)
+                        {
+                            richTextBox.AppendText("FC Orders for MR sales " + ordersmrsales.Count + Environment.NewLine);
+                            foreach (var s in ordersmrsales)
+                            {
+                                richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " S:" + s.Stock + " P:" + s.Price + Environment.NewLine);
+                            }
+                        }
+                    }
+
                     richTextBox.AppendText("---------------" + Environment.NewLine);
                 }
                 else
