@@ -406,8 +406,8 @@ namespace CAPIDemo
 
                 if (fc != null)
                 {
-                    //File.WriteAllText(rootpath+"fleetcarrierout.json", p);
-                    //richTextBox.AppendText("Response" + p + Environment.NewLine);
+                    File.WriteAllText(rootpath+"fleetcarrierout.json", p);
+                    richTextBox.AppendText("Response" + p + Environment.NewLine);
 
                     ReflectProperties(fc);
 
