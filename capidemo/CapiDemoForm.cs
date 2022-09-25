@@ -396,19 +396,49 @@ namespace CAPIDemo
         {
             if (capi.Active)
             {
-                string p = capi.FleetCarrier();
-
                 richTextBox.AppendText("-------------------------" + Environment.NewLine);
                 richTextBox.AppendText( "Fleet Carrier" + Environment.NewLine);
 
-                if (p != null)
+                string p = capi.FleetCarrier();
+                FleetCarrier fc =  p!=null ? new FleetCarrier(p) : null;
+
+//                FleetCarrier fc = new FleetCarrier(File.ReadAllText(@"c:\code\fleetcarrier.json")); // debug
+
+                if (fc != null)
                 {
-                    File.WriteAllText(rootpath+"fleetcarrier.json", p);
-                    richTextBox.AppendText("Response" + p + Environment.NewLine);
+                    //File.WriteAllText(rootpath+"fleetcarrierout.json", p);
+                    //richTextBox.AppendText("Response" + p + Environment.NewLine);
+
+                    ReflectProperties(fc);
+
+                    var services = fc.GetServices();
+                    foreach( var kvp in services)
+                    {
+                        richTextBox.AppendText($" Service {kvp.Key}" + Environment.NewLine);
+                        ReflectProperties(kvp.Value, "   ");
+                        if( kvp.Value.Invoices != null )
+                        {
+                            foreach (var x in kvp.Value.Invoices)
+                                ReflectProperties(x, "     ");
+                        }
+
+                    }
                     richTextBox.ScrollToCaret();
                 }
                 else
                     richTextBox.AppendText("No Data" + Environment.NewLine);
+            }
+
+        }
+
+        void ReflectProperties(Object fc, string prefix = " ")
+        {
+            foreach (System.Reflection.PropertyInfo pi in fc.GetType().GetProperties())
+            {
+                System.Reflection.MethodInfo getter = pi.GetGetMethod();
+                Object value = getter.Invoke(fc, null);
+                if (value != null)
+                    richTextBox.AppendText(prefix + pi.Name + " = " + value.ToString() + Environment.NewLine);
             }
 
         }

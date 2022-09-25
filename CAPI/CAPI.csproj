@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="CAPI.cs" />
     <Compile Include="Credentials.cs" />
+    <Compile Include="Fleetcarrier.cs" />
     <Compile Include="Journal.cs" />
     <Compile Include="Market.cs" />
     <Compile Include="Profile.cs" />
