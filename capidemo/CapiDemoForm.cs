@@ -358,7 +358,7 @@ namespace CAPIDemo
                     if (p != null)
                     {
                         string json = JToken.Parse(p, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL).ToString(true);
-                        File.WriteAllText(rootpath + "\\fleetcarrierdata", json);
+                        File.WriteAllText(rootpath + "\\fleetcarrierdata.json", json);
                         System.Diagnostics.Debug.WriteLine("Fleet JSON" + json);
                         fc = new FleetCarrier(p);
                     }
