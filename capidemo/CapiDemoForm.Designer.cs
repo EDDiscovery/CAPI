@@ -74,11 +74,15 @@
             // 
             // richTextBox
             // 
+            this.richTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox.Location = new System.Drawing.Point(137, 12);
             this.richTextBox.Name = "richTextBox";
             this.richTextBox.Size = new System.Drawing.Size(1085, 822);
             this.richTextBox.TabIndex = 3;
             this.richTextBox.Text = "";
+            this.richTextBox.DoubleClick += new System.EventHandler(this.richTextBox_DoubleClick);
             // 
             // button4
             // 
@@ -163,7 +167,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1260, 820);
+            this.ClientSize = new System.Drawing.Size(1260, 860);
             this.Controls.Add(this.checkBoxBeta);
             this.Controls.Add(this.dateTimePicker);
             this.Controls.Add(this.richTextBox);

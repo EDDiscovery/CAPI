@@ -23,11 +23,10 @@ namespace CAPI
 {
     // this decodes the Fleet carrier endpoint
 
-    public class FleetCarrier
+    public class FleetCarrier : CAPIEndPointBaseClass
     {
-        public FleetCarrier(string profile)
+        public FleetCarrier(string profile) : base(profile)
         {
-            json = JToken.Parse(profile, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL);
         }
 
         public bool IsValid { get { return json != null && Name != null && CallSign != null; } }
@@ -102,7 +101,7 @@ namespace CAPI
             public string Type { get; set; }
         }
 
-        public class Services
+        public class CrewService
         {
             public string CrewMemberName { get; set; }
             public bool CrewMemberMale { get; set; }
@@ -114,19 +113,19 @@ namespace CAPI
             public List <Invoice> Invoices { get; set; }
         };
 
-        public Dictionary<string, Services> GetServices()
+        public Dictionary<string, CrewService> GetCrewServices()
         {
             JObject services = json["servicesCrew"].Object();
             if (services != null)
             {
-                Dictionary<string, Services> ret = new Dictionary<string, Services>();
+                Dictionary<string, CrewService> ret = new Dictionary<string, CrewService>();
                 foreach (var kvp in services)
                 {
                     JObject crew = kvp.Value["crewMember"].Object();
 
                     if (crew != null)
                     {
-                        Services s = new Services();
+                        CrewService s = new CrewService();
                         s.CrewMemberName = crew["name"].Str();
                         s.CrewMemberMale = crew["gender"].Str("M") == "M";
                         s.CrewMemberEnabled = crew["enabled"].Str("No") == "YES";
@@ -161,15 +160,104 @@ namespace CAPI
                 return null;
         }
 
-        //cargo..
+        public class Cargo
+        {
+            public string Commodity { get; set; }
+            public bool Mission { get; set; }
+            public int Quantity { get; set; }
+            public long Value { get; set; }
+            public bool Stolen { get; set; }
+            public string LocName { get; set; }
+        };
 
-        //   public long Bartender { get { return json["finance"].I("bartender").I("microresources").Long(0); } }
-        //  public long Bartender { get { return json["finance"].I("bartender").I("microresources").Long(0); } }
-        //public long Cargo { get { return json["marketFinances"].I("").Long(0); } }
-        //public long Cargo { get { return json["marketFinances"].I("").Long(0); } }
-        //public long Cargo { get { return json["marketFinances"].I("").Long(0); } }
-        //public long Cargo { get { return json["marketFinances"].I("").Long(0); } }
+        public List<Cargo> GetCargo()
+        {
+            JArray clist = json["cargo"].Array();
+            if ( clist != null )
+            {
+                List<Cargo> cargo = new List<Cargo>();
+                foreach( var entry in clist)
+                {
+                    Cargo c = new Cargo();
+                    c.Commodity = entry["commodity"].Str("Unknown");
+                    c.Mission = entry["mission"].Bool();
+                    c.Stolen = entry["stolen"].Bool();
+                    c.Quantity = entry["qty"].Int();
+                    c.Value = entry["value"].Long();
+                    c.LocName = entry["locName"].Str("Unknown");
+                    cargo.Add(c);
+                }
+                return cargo;
+            }
+            return null;
+        }
 
-        private QuickJSON.JToken json;
+        public Dictionary<string, int> GetReputation()
+        {
+            JArray rlist = json["reputation"].Array();
+            if (rlist != null)
+            {
+                Dictionary<string, int> rep = new Dictionary<string, int>();
+                foreach (var entry in rlist)
+                {
+                    JObject o = entry.Object();
+                    rep.Add(o["majorFaction"].Str(), o["score"].Int());
+                }
+
+                return rep;
+            }
+            else
+                return null;
+        }
+
+        public long ID { get { return json["market"].I("id").Long(0); } }
+
+        // id name pairs
+        public Dictionary<string, string> Imports { get { return json["market"].I("imported").Object()?.ToObject<Dictionary<string, string>>(); } }
+        public Dictionary<string, string> Exports { get { return json["market"].I("exported").Object()?.ToObject<Dictionary<string, string>>(); } }
+        public Dictionary<string, string> Services { get { return json["market"].I("services").Object()?.ToObject<Dictionary<string, string>>(); } }
+        public Dictionary<string, string> Prohibited { get { return json["market"].I("prohibited").Object()?.ToObject<Dictionary<string, string>>(); } }
+        public Dictionary<string, double> Economies { get { return GetEconomies(json["market"].I("economies").Object()); } }
+        public List<Commodity> GetCommodities()     // may return null, returns commodities info
+        {
+            return GetCommodityList(json["market"].I("commodities").Array());
+        }
+
+        public List<OrdersCommoditySales> GetOrdersCommoditiesSales()     // may return null. Returns name, locName, price, stock
+        {
+            return GetOrdersCommoditiesSales(OrdersCommoditiesSales);
+        }
+        public List<OrdersCommodityPurchases> GetOrdersCommoditiesPurchaces()     // may return null. Returns name, locName, price, stock
+        {
+            return GetOrdersCommoditiesPurchases(OrdersCommoditiesPurchases);
+        }
+        public List<OrdersMRSales> GetOrdersMicroresourcesSales()     // may return null. Returns name, locName, price, stock
+        {
+            return GetOrdersMicroresourcesSales(OrdersMicroResourcesSales);
+        }
+        public List<OrdersMRPurchases> GetOrdersMicroresourcesPurchases()     // may return null. Returns name, locName, price, stock
+        {
+            return GetOrdersMicroresourcesPurchases(OrdersMicroResourcesPurchases);
+        }
+
+        public List<Module> GetModules()        // may be null if no shipyard
+        {
+            return GetModules(json.I("modules").Object());
+        }
+        public List<Ship> GetShips()        // may be null if no shipyard
+        {
+            return GetShips(json.I("ships").I("shipyard_list").Object());
+        }
+
+        private JArray OrdersCommoditiesSales { get { return json["orders"].I("commodities").I("sales").Array(); } }
+        private JArray OrdersCommoditiesPurchases { get { return json["orders"].I("commodities").I("purchases").Array(); } }
+        private JObject OrdersMicroResourcesSales { get { return json["orders"].I("onfootmicroresources").I("sales").Object(); } }
+        private JArray OrdersMicroResourcesPurchases { get { return json["orders"].I("onfootmicroresources").I("purchases").Array(); } }
+
+
+        // TBD on carrierLocker
+
+
+
     }
 }

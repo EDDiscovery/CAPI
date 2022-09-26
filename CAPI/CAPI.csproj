@@ -49,6 +49,7 @@
     <Compile Include="Credentials.cs" />
     <Compile Include="Fleetcarrier.cs" />
     <Compile Include="Journal.cs" />
+    <Compile Include="EndPointBaseClass.cs" />
     <Compile Include="Market.cs" />
     <Compile Include="Profile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

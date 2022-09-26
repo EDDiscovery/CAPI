@@ -56,7 +56,6 @@ namespace CAPI
         public bool Odyssey { get { return json["commander"].I("capabilities").I("Odyssey").Bool(); } } // odyssey
 
         // Last System
-
         public string System { get { return json.I("lastSystem").I("name").StrNull(); } }
         public long SystemAddress { get { return json.I("lastSystem").I("id").Long(); } }
         public string SystemMajorFaction { get { return json.I("lastSystem").I("faction").Str("Unknown"); } }
@@ -72,13 +71,13 @@ namespace CAPI
         // Ship
 
         public string Ship { get { return json.I("ship").I("name").StrNull(); } }
-        public string ShipName { get { return json.I("ship").I("shipName").StrNull(); } }
-        public string ShipIdent { get { return json.I("ship").I("shipID").StrNull(); } }
         public long ShipHullValue { get { return json.I("ship").I("value").I("hull").Long(); } }
         public long ShipModuleValue { get { return json.I("ship").I("value").I("modules").Long(); } }
         public long ShipCargo { get { return json.I("ship").I("value").I("cargo").Long(); } }
         public long ShipTotalValue { get { return json.I("ship").I("value").I("total").Long(); } }
         public long ShipInsurance { get { return json.I("ship").I("value").I("unloaned").Long(); } }
+        public string ShipName { get { return json.I("ship").I("shipName").StrNull(); } }
+        public string ShipIdent { get { return json.I("ship").I("shipID").StrNull(); } }
         public double ShipHealth { get { return json.I("ship").I("health").I("hull").Double() / 10000.0; } }      // in %, 0-100
         public double ShipShield { get { return json.I("ship").I("health").I("shield").Double() / 10000.0; } }    // in %, 0-100
         public bool ShipShieldUp { get { return json.I("ship").I("health").I("shieldup").Bool(); } }
@@ -89,19 +88,19 @@ namespace CAPI
 
         public class Module
         {
-            public string Location;
-            public string Name;
-            public string LocName;
-            public string LocDescription;
-            public long Value;
-            public bool Free;
-            public double Health;
-            public bool On;
-            public int Priority;
-            public long ID;
+            public string Location{get;set;}
+            public string Name{get;set;}
+            public string LocName{get;set;}
+            public string LocDescription{get;set;}
+            public long Value{get;set;}
+            public bool Free{get;set;}
+            public double Health{get;set;}
+            public bool On{get;set;}
+            public int Priority{get;set;}
+            public long ID{get;set;}
         }
 
-        public List<Module> GetModules()  // may return null
+        public List<Module> GetShipModules()  // may return null
         {
             JObject moduleslist = json.I("ship").I("modules").Object();
             if ( moduleslist != null )
@@ -140,16 +139,16 @@ namespace CAPI
 
         public class LaunchBay
         {
-            public string Location;
-            public string SubSlot;
-            public string Name;
-            public string LocName;
-            public int Rebuilds;
-            public string Loadout;
-            public string LoadoutName;
+            public string Location{get;set;}
+            public string SubSlot{get;set;}
+            public string Name{get;set;}
+            public string LocName{get;set;}
+            public int Rebuilds{get;set;}
+            public string Loadout{get;set;}
+            public string LoadoutName{get;set;}
         }
 
-        public List<LaunchBay> GetLaunchBays()  // may return null
+        public List<LaunchBay> GetShipLaunchBays()  // may return null
         {
             JObject baylist = json.I("ship").I("launchBays").Object();
             if (baylist != null)
@@ -184,18 +183,18 @@ namespace CAPI
 
         public class ShipInfo
         {
-            public long ID;
-            public string Name;
-            public long ValueHull;
-            public long ValueModules;
-            public int Cargo;
-            public long ValueTotal;
-            public long Insurance;
-            public bool Free;
-            public long StationID;
-            public string Station;
-            public string System;
-            public long SystemAddress;
+            public long ID{get;set;}
+            public string Name{get;set;}
+            public long ValueHull{get;set;}
+            public long ValueModules{get;set;}
+            public int Cargo{get;set;}
+            public long ValueTotal{get;set;}
+            public long Insurance{get;set;}
+            public bool Free{get;set;}
+            public long StationID{get;set;}
+            public string Station{get;set;}
+            public string System{get;set;}
+            public long SystemAddress{get;set;}
         }
 
         public List<ShipInfo> GetShips()
@@ -247,30 +246,30 @@ namespace CAPI
 
         public class SuitSlot
         {
-            public string SlotName;
-            public string Name;
-            public string LocName;
-            public string LocDescription;
-            public long ID;
-            public long WeaponRackID;
+            public string SlotName{get;set;}
+            public string Name{get;set;}
+            public string LocName{get;set;}
+            public string LocDescription{get;set;}
+            public long ID{get;set;}
+            public long WeaponRackID{get;set;}
 
             // additional info only in Current Loadout
 
-            public double Health;       // %
-            public long Value;
-            public bool Free;
-            public int AmmoClip;
-            public int HopperSize;
+            public double Health{get;set;}       // %
+            public long Value{get;set;}
+            public bool Free{get;set;}
+            public int AmmoClip{get;set;}
+            public int HopperSize{get;set;}
         }
 
         public class SuitLoadout
         {
-            public long LoadoutID;
-            public long SuitID;
-            public string SuitName;
-            public string SuitLocName;
-            public string UserLoadoutName;
-            public List<SuitSlot> slots;
+            public long LoadoutID{get;set;}
+            public long SuitID{get;set;}
+            public string SuitName{get;set;}
+            public string SuitLocName{get;set;}
+            public string UserLoadoutName{get;set;}
+            public List<SuitSlot> slots{get;set;}
         }
 
         public List<SuitLoadout> GetSuitLoadouts()

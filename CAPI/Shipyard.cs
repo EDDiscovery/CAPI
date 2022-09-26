@@ -25,11 +25,10 @@ namespace CAPI
     // then all entries will return null. Use IsValid to know you got data, but you still need to check each for null
     // as its frontiers data and they may have left the node out
 
-    public class Shipyard
+    public class Shipyard : CAPIEndPointBaseClass
     {
-        public Shipyard(string profile)
+        public Shipyard(string profile) : base(profile)
         {
-            json = JToken.Parse(profile, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL);
         }
 
         public bool IsValid { get { return json != null && ID != long.MinValue && Name != null; } }
@@ -44,100 +43,16 @@ namespace CAPI
         public Dictionary<string, string> Imports { get { return json["imported"].Object()?.ToObject<Dictionary<string, string>>(); } }
         public Dictionary<string, string> Exports { get { return json["exported"].Object()?.ToObject<Dictionary<string, string>>(); } }
         public Dictionary<string, string> Services { get { return json["services"].Object()?.ToObject<Dictionary<string, string>>(); } }
-        public Dictionary<string, double> Economies
-        {
-            get
-            {
-                JObject data = json["economies"].Object();
-                if (data != null)
-                {
-                    var list = new Dictionary<string, double>();
-                    foreach (var e in data)
-                        list.Add(e.Value["name"].Str("Unknown"), e.Value["proportion"].Double() * 100.0);
-                    return list;
-                }
-                else
-                    return null;
-            }
-        }
-
-        public class Module
-        {
-            public long ID;
-            public string Category;
-            public string Name;
-            public long Cost;
-            public long Stock;
-        }
+        public Dictionary<string, double> Economies { get { return GetEconomies(json["economies"].Object()); } }
 
         public List<Module> GetModules()        // may be null if no shipyard
         {
-            JObject moduleslist = json.I("modules").Object();
-            if (moduleslist != null)
-            {
-                List<Module> list = new List<Module>();
-                foreach (var kvp in moduleslist)
-                {
-                    JObject data = kvp.Value.Object();
-                    if (data != null)
-                    {
-                        Module m = new Module()
-                        {
-                            ID = data["id"].Long(),
-                            Category = data["category"].Str(),
-                            Name = data["name"].Str(),
-                            Cost = data["cost"].Long(),
-                            Stock = data["stock"].Long(),
-                        };
-
-                        list.Add(m);
-                    }
-
-                }
-
-                return list;
-            }
-            return null;
+            return GetModules(json.I("modules").Object());
         }
-
-        public class Ship
-        {
-            public long ID;
-            public string Name;
-            public long BaseValue;
-            public string SKU;
-        }
-
         public List<Ship> GetShips()        // may be null if no shipyard
         {
-            JObject shiplist = json.I("ships").I("shipyard_list").Object();
-            if (shiplist != null)
-            {
-                List<Ship> list = new List<Ship>();
-                foreach (var kvp in shiplist)
-                {
-                    JObject data = kvp.Value.Object();
-                    if (data != null)
-                    {
-                        Ship m = new Ship()
-                        {
-                            ID = data["id"].Long(),
-                            Name = data["name"].Str(),
-                            BaseValue = data["basevalue"].Long(),
-                            SKU = data["sku"].Str(),
-                        };
-
-                        list.Add(m);
-                    }
-
-                }
-
-                return list;
-            }
-            return null;
+            return GetShips(json.I("ships").I("shipyard_list").Object());
         }
 
-
-        private QuickJSON.JToken json;
     }
 }
