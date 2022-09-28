@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace BaseUtils
@@ -56,6 +57,46 @@ namespace BaseUtils
             else
                 return null;
         }
+
+        static public int? ToHex(this char c)
+        {
+            if (char.IsDigit(c))
+                return c - '0';
+            else if ("ABCDEF".Contains(c))
+                return c - 'A' + 10;
+            else if ("abcdef".Contains(c))
+                return c - 'a' + 10;
+            else
+                return null;
+        }
+
+        static public int? ToHex(this string s, int p)
+        {
+            if ( s.Length>p+1)
+            {
+                int? top = ToHex(s[p]);
+                int? bot = ToHex(s[p+1]);
+                if (top.HasValue && bot.HasValue)
+                    return (top << 4) | bot;
+            }
+            return null;
+        }
+
+        static public string FromHexString(this string ascii)
+        {
+            string s = "";
+            for( int i = 0; i < ascii.Length; i += 2)
+            {
+                int? v = ascii.ToHex(i);
+                if (v.HasValue)
+                    s += Convert.ToChar(v.Value);
+                else
+                    return null;
+            }
+
+            return s;
+        }
+
     }
 }
 

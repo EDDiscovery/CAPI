@@ -54,7 +54,7 @@
             // 
             // buttonProfile
             // 
-            this.buttonProfile.Location = new System.Drawing.Point(47, 136);
+            this.buttonProfile.Location = new System.Drawing.Point(47, 127);
             this.buttonProfile.Name = "buttonProfile";
             this.buttonProfile.Size = new System.Drawing.Size(75, 23);
             this.buttonProfile.TabIndex = 1;
@@ -64,7 +64,7 @@
             // 
             // buttonMarket
             // 
-            this.buttonMarket.Location = new System.Drawing.Point(47, 187);
+            this.buttonMarket.Location = new System.Drawing.Point(47, 156);
             this.buttonMarket.Name = "buttonMarket";
             this.buttonMarket.Size = new System.Drawing.Size(75, 23);
             this.buttonMarket.TabIndex = 2;
@@ -79,14 +79,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.richTextBox.Location = new System.Drawing.Point(137, 12);
             this.richTextBox.Name = "richTextBox";
-            this.richTextBox.Size = new System.Drawing.Size(1085, 822);
+            this.richTextBox.Size = new System.Drawing.Size(1319, 1017);
             this.richTextBox.TabIndex = 3;
             this.richTextBox.Text = "";
             this.richTextBox.DoubleClick += new System.EventHandler(this.richTextBox_DoubleClick);
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(47, 445);
+            this.button4.Location = new System.Drawing.Point(47, 387);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 2;
@@ -96,7 +96,7 @@
             // 
             // buttonShipYard
             // 
-            this.buttonShipYard.Location = new System.Drawing.Point(47, 236);
+            this.buttonShipYard.Location = new System.Drawing.Point(47, 185);
             this.buttonShipYard.Name = "buttonShipYard";
             this.buttonShipYard.Size = new System.Drawing.Size(75, 23);
             this.buttonShipYard.TabIndex = 2;
@@ -116,7 +116,7 @@
             // 
             // buttonJournal
             // 
-            this.buttonJournal.Location = new System.Drawing.Point(47, 306);
+            this.buttonJournal.Location = new System.Drawing.Point(47, 335);
             this.buttonJournal.Name = "buttonJournal";
             this.buttonJournal.Size = new System.Drawing.Size(75, 23);
             this.buttonJournal.TabIndex = 2;
@@ -127,14 +127,14 @@
             // dateTimePicker
             // 
             this.dateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePicker.Location = new System.Drawing.Point(21, 280);
+            this.dateTimePicker.Location = new System.Drawing.Point(21, 309);
             this.dateTimePicker.Name = "dateTimePicker";
             this.dateTimePicker.Size = new System.Drawing.Size(101, 20);
             this.dateTimePicker.TabIndex = 4;
             // 
             // buttonFleetCarrier
             // 
-            this.buttonFleetCarrier.Location = new System.Drawing.Point(47, 346);
+            this.buttonFleetCarrier.Location = new System.Drawing.Point(47, 214);
             this.buttonFleetCarrier.Name = "buttonFleetCarrier";
             this.buttonFleetCarrier.Size = new System.Drawing.Size(75, 23);
             this.buttonFleetCarrier.TabIndex = 2;
@@ -144,7 +144,7 @@
             // 
             // buttonCG
             // 
-            this.buttonCG.Location = new System.Drawing.Point(47, 383);
+            this.buttonCG.Location = new System.Drawing.Point(47, 243);
             this.buttonCG.Name = "buttonCG";
             this.buttonCG.Size = new System.Drawing.Size(75, 23);
             this.buttonCG.TabIndex = 2;
@@ -167,7 +167,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1260, 860);
+            this.ClientSize = new System.Drawing.Size(1494, 1055);
             this.Controls.Add(this.checkBoxBeta);
             this.Controls.Add(this.dateTimePicker);
             this.Controls.Add(this.richTextBox);

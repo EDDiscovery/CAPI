@@ -47,9 +47,11 @@ namespace CAPI
         public Dictionary<string, string> Prohibited { get { return json["prohibited"].Object()?.ToObject<Dictionary<string, string>>(); } }
         public Dictionary<string, double> Economies { get { return GetEconomies(json["economies"].Object()); } }
 
+        public JArray Commodities { get { return json["commodities"].Array(); } }       // return the JSON array, or Null
+            
         public List<Commodity> GetCommodities()     // may return null, returns commodities info
         {
-            return GetCommodityList(json["commodities"].Array());
+            return GetCommodityList(Commodities);
         }
         public List<OrdersCommoditySales> GetOrdersCommoditiesSales()     // may return null. Returns name, locName, price, stock
         {

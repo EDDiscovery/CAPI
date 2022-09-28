@@ -102,12 +102,13 @@ namespace CAPIDemo
                     System.Diagnostics.Debug.WriteLine("Profile JSON" + json);
                 }
 
-                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+                richTextBox.AppendText("------------------------- PROFILE" + Environment.NewLine);
 
                 Profile pf = p != null ? new Profile(p) : null;
                 if (pf != null && pf.IsValid)
                 {
-                    ReflectProperties(pf, " ");
+                    ReflectProperties(pf, " ", eol:", ");
+                    richTextBox.AppendText(Environment.NewLine);
 
                     var ml = pf.GetShipModules();
                     if (ml != null)
@@ -115,8 +116,9 @@ namespace CAPIDemo
                         richTextBox.AppendText("Modules " + ml.Count + Environment.NewLine);
                         foreach (var m in ml)
                         {
-                            richTextBox.AppendText(" " + m.Name + " " + m.Value + Environment.NewLine);
+                            richTextBox.AppendText(" " + m.Name + " " + m.Value + ", ");
                         }
+                        richTextBox.AppendText(Environment.NewLine);
                     }
                     else
                         richTextBox.AppendText("No Modules" + Environment.NewLine);
@@ -139,8 +141,9 @@ namespace CAPIDemo
                         richTextBox.AppendText("Ships " + sh.Count + Environment.NewLine);
                         foreach (var s in sh)
                         {
-                            richTextBox.AppendText(" " + s.Name + " C:" + s.Cargo + " S:" + s.Station + Environment.NewLine);
+                            richTextBox.AppendText(" " + s.Name + " C:" + s.Cargo + " S:" + s.Station + ", ");
                         }
+                        richTextBox.AppendText(Environment.NewLine);
                     }
                     else
                         richTextBox.AppendText("No ships" + Environment.NewLine);
@@ -176,12 +179,11 @@ namespace CAPIDemo
                     else
                         richTextBox.AppendText("No current suit loadouts" + Environment.NewLine);
 
-                    richTextBox.AppendText("---------------" + Environment.NewLine);
                 }
                 else
                     richTextBox.AppendText( "No profile" + Environment.NewLine);
 
-                richTextBox.AppendText("---------------" + Environment.NewLine);
+                richTextBox.AppendText("------------------------- /PROFILE" + Environment.NewLine);
                 richTextBox.ScrollToCaret();
             }
         }
@@ -196,150 +198,162 @@ namespace CAPIDemo
                 {
                     string json = JToken.Parse(p, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL).ToString(true);
                     File.WriteAllText(rootpath + "\\market.json", json);
-                    System.Diagnostics.Debug.WriteLine("Market JSON" + json);
+                  //  System.Diagnostics.Debug.WriteLine("Market JSON" + json);
                 }
 
-                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+                richTextBox.AppendText("------------------------- MARKET" + Environment.NewLine);
 
-                Market mk = p != null ? new Market(p) : null;
+                Market ep = p != null ? new Market(p) : null;
                 //Market mk = new Market(File.ReadAllText(@"c:\code\logs\capi\market-default(1).json")); // debug
 
-                if (mk != null && mk.IsValid)
+                if (ep != null && ep.IsValid)
                 {
-                    ReflectProperties(mk, " ");
+                    ReflectProperties(ep, " ");
 
                     {
-                        var imports = mk.Imports;
+                        var imports = ep.Imports;
                         if (imports != null)
                         {
-                            richTextBox.AppendText("Imports" + Environment.NewLine);
+                            richTextBox.AppendText("Imports: ");
                             foreach (var kvp in imports)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
+
                         }
                         else
                             richTextBox.AppendText("No Imports" + Environment.NewLine);
                     }
 
                     {
-                        var exports = mk.Exports;
+                        var exports = ep.Exports;
                         if (exports != null)
                         {
-                            richTextBox.AppendText("exports" + Environment.NewLine);
+                            richTextBox.AppendText("exports: " );
                             foreach (var kvp in exports)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Exports" + Environment.NewLine);
                     }
 
                     {
-                        var services = mk.Services;
+                        var services = ep.Services;
                         if (services != null)
                         {
-                            richTextBox.AppendText("services" + Environment.NewLine);
+                            richTextBox.AppendText("services: " );
                             foreach (var kvp in services)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Services" + Environment.NewLine);
                     }
 
                     {
-                        var economies = mk.Economies;
+                        var economies = ep.Economies;
                         if (economies != null)
                         {
-                            richTextBox.AppendText("economies" + Environment.NewLine);
+                            richTextBox.AppendText("economies: " );
                             foreach (var kvp in economies)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Economies" + Environment.NewLine);
                     }
 
                     {
-                        var prohibit = mk.Prohibited;
+                        var prohibit = ep.Prohibited;
                         if (prohibit != null)
                         {
-                            richTextBox.AppendText("prohibit" + Environment.NewLine);
+                            richTextBox.AppendText("prohibit: " );
                             foreach (var kvp in prohibit)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Prohibited" + Environment.NewLine);
                     }
 
                     {
-                        var commodities = mk.GetCommodities();
+                        var commodities = ep.GetCommodities();
                         if (commodities != null)
                         {
-                            richTextBox.AppendText("Commds " + commodities.Count + Environment.NewLine);
+                            richTextBox.AppendText("Commds " + commodities.Count + ": ");
                             foreach (var s in commodities)
                             {
-                                richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " S:" + s.Sell + " B:" + s.Buy + " Stock:" + s.Stock + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
+
                         }
                         else
                             richTextBox.AppendText("No Commodities" + Environment.NewLine);
                     }
 
                     {
-                        var orderssales = mk.GetOrdersCommoditiesSales();
+                        var orderssales = ep.GetOrdersCommoditiesSales();
                         if (orderssales != null)
                         {
-                            richTextBox.AppendText("FC Orders for sales " + orderssales.Count + Environment.NewLine);
+                            richTextBox.AppendText("FC Orders for commodity.sales " + orderssales.Count + ": ");
                             foreach (var s in orderssales)
                             {
-                                richTextBox.AppendText("        " + s.Name +  " P:" + s.Price + " Stock:" + s.Stock + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
                             richTextBox.AppendText("No Orders Commodities Sales" + Environment.NewLine);
                     }
                     {
-                        var orderspurchases = mk.GetOrdersCommoditiesPurchaces();
+                        var orderspurchases = ep.GetOrdersCommoditiesPurchaces();
                         if (orderspurchases != null)
                         {
-                            richTextBox.AppendText("FC Orders for purchases " + orderspurchases.Count + Environment.NewLine);
+                            richTextBox.AppendText("FC Orders for commodity.purchases " + orderspurchases.Count + ": ");
                             foreach (var s in orderspurchases)
                             {
-                                richTextBox.AppendText("        " + s.Name + " T:" + s.Total + " O:" + s.Outstanding + " P:" + s.Price + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
                             richTextBox.AppendText("No Orders Commodities Purchases" + Environment.NewLine);
                     }
                     {
-                        var ordersmrpurchases = mk.GetOrdersMicroresourcesPurchases();
+                        var ordersmrpurchases = ep.GetOrdersMicroresourcesPurchases();
                         if (ordersmrpurchases != null)
                         {
-                            richTextBox.AppendText("FC Orders for MR purchases " + ordersmrpurchases.Count + Environment.NewLine);
+                            richTextBox.AppendText("FC Orders for MR purchases " + ordersmrpurchases.Count + ": ");
                             foreach (var s in ordersmrpurchases)
                             {
-                                richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " T:" + s.Total + " O:" + s.Outstanding + " P:" + s.Price + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
                             richTextBox.AppendText("No MR Purchases" + Environment.NewLine);
                     }
                     {
-                        var ordersmrsales = mk.GetOrdersMicroresourcesSales();
+                        var ordersmrsales = ep.GetOrdersMicroresourcesSales();
                         if (ordersmrsales != null)
                         {
-                            richTextBox.AppendText("FC Orders for MR sales " + ordersmrsales.Count + Environment.NewLine);
+                            richTextBox.AppendText("FC Orders for MR sales " + ordersmrsales.Count + ": ");
                             foreach (var s in ordersmrsales)
                             {
-                                richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " S:" + s.Stock + " P:" + s.Price + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
                             richTextBox.AppendText("No MR sales" + Environment.NewLine);
                     }
 
-                    richTextBox.AppendText("---------------" + Environment.NewLine);
                 }
                 else
                     richTextBox.AppendText("No market data" + Environment.NewLine);
 
+                richTextBox.AppendText("------------------------- /MARKET" + Environment.NewLine);
                 richTextBox.ScrollToCaret();
             }
         }
@@ -350,7 +364,7 @@ namespace CAPIDemo
 
             if (debugfile || capi.Active)
             {
-                FleetCarrier fc = null;
+                FleetCarrier ep = null;
 
                 if (!debugfile)
                 {
@@ -360,95 +374,203 @@ namespace CAPIDemo
                         string json = JToken.Parse(p, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL).ToString(true);
                         File.WriteAllText(rootpath + "\\fleetcarrierdata.json", json);
                         System.Diagnostics.Debug.WriteLine("Fleet JSON" + json);
-                        fc = new FleetCarrier(p);
+                        ep = new FleetCarrier(p);
                     }
                 }
                 else
                 {
-                    fc = new FleetCarrier(File.ReadAllText(@"c:\code\fleetcarrier.json")); // debug
+                    ep = new FleetCarrier(File.ReadAllText(@"c:\code\fleetcarrier.json")); // debug
                 }
 
+                richTextBox.AppendText("------------------------- FLEET CARRIER" + Environment.NewLine);
 
-                richTextBox.AppendText("-------------------------" + Environment.NewLine);
-                richTextBox.AppendText("Fleet Carrier" + Environment.NewLine);
-
-                if (fc != null && fc.IsValid)
+                if (ep != null && ep.IsValid)
                 {
-                    ReflectProperties(fc);
+                    //ReflectProperties(ep, eol:", ");
+                    ReflectProperties(ep);
+                    richTextBox.AppendText(Environment.NewLine);
 
                     {
-                        var services = fc.GetCrewServices();
-                        foreach (var kvp in services)
+                        var it = ep.GetCompletedItinerary();
+                        if (it != null)
                         {
-                            richTextBox.AppendText($" Service {kvp.Key}" + Environment.NewLine);
-                            ReflectProperties(kvp.Value, "   ");
-                            if (kvp.Value.Invoices != null)
-                            {
-                                foreach (var x in kvp.Value.Invoices)
-                                    ReflectProperties(x, "     ", "     .. ");
-                            }
+                            richTextBox.AppendText("Itinerary" + Environment.NewLine);
+                            foreach (var v in it)
+                                ReflectProperties(v, eol: ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
+                        else
+                            richTextBox.AppendText("No Itinerary" + Environment.NewLine);
+                    }
+                    {
+                        var imports = ep.Imports;
+                        if (imports != null)
+                        {
+                            richTextBox.AppendText("Market.Imports: " );
+                            foreach (var kvp in imports)
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
+
+                        }
+                        else
+                            richTextBox.AppendText("No Market.Imports" + Environment.NewLine);
                     }
 
                     {
-                        var cargo = fc.GetCargo();
+                        var exports = ep.Exports;
+                        if (exports != null)
+                        {
+                            richTextBox.AppendText("Market.Exports: ");
+                            foreach (var kvp in exports)
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
+                        }
+                        else
+                            richTextBox.AppendText("No Market.Exports" + Environment.NewLine);
+                    }
+
+                    {
+                        var services = ep.Services;
+                        if (services != null)
+                        {
+                            richTextBox.AppendText("Market.Services: ");
+                            foreach (var kvp in services)
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
+                        }
+                        else
+                            richTextBox.AppendText("No Market.Services" + Environment.NewLine);
+                    }
+
+                    {
+                        var economies = ep.Economies;
+                        if (economies != null)
+                        {
+                            richTextBox.AppendText("Market.Economies: ");
+                            foreach (var kvp in economies)
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
+                        }
+                        else
+                            richTextBox.AppendText("No Market.Economies" + Environment.NewLine);
+                    }
+
+                    {
+                        var prohibit = ep.Prohibited;
+                        if (prohibit != null)
+                        {
+                            richTextBox.AppendText("Market.Prohibited: ");
+                            foreach (var kvp in prohibit)
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
+                        }
+                        else
+                            richTextBox.AppendText("No Market.Prohibited" + Environment.NewLine);
+                    }
+
+                    {
+                        var commodities = ep.GetMarketCommodities();
+                        if (commodities != null)
+                        {
+                            richTextBox.AppendText("Market.Commodities " + commodities.Count + ": ");
+                            foreach (var s in commodities)
+                            {
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
+                            }
+                        }
+                        else
+                            richTextBox.AppendText("Commds null" + Environment.NewLine);
+                    }
+
+                    {
+                        var services = ep.GetCrewServices();
+                        if (services != null)
+                        {
+                            foreach (var kvp in services)
+                            {
+                                richTextBox.AppendText($"serviceCrew {kvp.Key} :");
+                                ReflectProperties(kvp.Value, "   ", eol: ", ");
+                                if (kvp.Value.Invoices != null)
+                                {
+                                    richTextBox.AppendText(Environment.NewLine);
+                                    foreach (var x in kvp.Value.Invoices)
+                                        ReflectProperties(x, " ", eol:", ");
+                                }
+                                richTextBox.AppendText(Environment.NewLine);
+                            }
+                        }
+                        else
+                            richTextBox.AppendText("No Crew Services" + Environment.NewLine);
+                    }
+
+                    {
+                        var cargo = ep.GetCargo();
                         if (cargo != null)
                         {
-                            richTextBox.AppendText($" Cargo" + Environment.NewLine);
+                            richTextBox.AppendText($"Cargo: " );
                             foreach (var c in cargo)
-                                ReflectProperties(c, "     ", "     .. ");
+                            {
+                                ReflectProperties(c, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
+                            }
                         }
                         else
                             richTextBox.AppendText("No Cargo" + Environment.NewLine);
                     }
 
+
                     {
-                        var orderssales = fc.GetOrdersCommoditiesSales();
+                        var orderssales = ep.GetOrdersCommoditiesSales();
                         if (orderssales != null)
                         {
-                            richTextBox.AppendText("FC Orders for sales " + orderssales.Count + Environment.NewLine);
+                            richTextBox.AppendText("FC Orders for commodity.sales " + orderssales.Count + ": ");
                             foreach (var s in orderssales)
                             {
-                                richTextBox.AppendText("        " + s.Name + " P:" + s.Price + " Stock:" + s.Stock + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
                             richTextBox.AppendText("No Orders Commodities Sales" + Environment.NewLine);
                     }
                     {
-                        var orderspurchases = fc.GetOrdersCommoditiesPurchaces();
+                        var orderspurchases = ep.GetOrdersCommoditiesPurchaces();
                         if (orderspurchases != null)
                         {
-                            richTextBox.AppendText("FC Orders for purchases " + orderspurchases.Count + Environment.NewLine);
+                            richTextBox.AppendText("FC Orders for commodity.purchases " + orderspurchases.Count + ": ");
                             foreach (var s in orderspurchases)
                             {
-                                richTextBox.AppendText("        " + s.Name + " T:" + s.Total + " O:" + s.Outstanding + " P:" + s.Price + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
                             richTextBox.AppendText("No Orders Commodities Purchases" + Environment.NewLine);
                     }
                     {
-                        var ordersmrpurchases = fc.GetOrdersMicroresourcesPurchases();
+                        var ordersmrpurchases = ep.GetOrdersMicroresourcesPurchases();
                         if (ordersmrpurchases != null)
                         {
-                            richTextBox.AppendText("FC Orders for MR purchases " + ordersmrpurchases.Count + Environment.NewLine);
+                            richTextBox.AppendText("FC Orders for MR purchases " + ordersmrpurchases.Count + ": ");
                             foreach (var s in ordersmrpurchases)
                             {
-                                richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " T:" + s.Total + " O:" + s.Outstanding + " P:" + s.Price + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
                             richTextBox.AppendText("No MR Purchases" + Environment.NewLine);
                     }
                     {
-                        var ordersmrsales = fc.GetOrdersMicroresourcesSales();
+                        var ordersmrsales = ep.GetOrdersMicroresourcesSales();
                         if (ordersmrsales != null)
                         {
-                            richTextBox.AppendText("FC Orders for MR sales " + ordersmrsales.Count + Environment.NewLine);
+                            richTextBox.AppendText("FC Orders for MR sales " + ordersmrsales.Count + ": ");
                             foreach (var s in ordersmrsales)
                             {
-                                richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " S:" + s.Stock + " P:" + s.Price + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
@@ -456,105 +578,93 @@ namespace CAPIDemo
                     }
 
                     {
-                        var rep = fc.GetReputation();
+                        var v = ep.GetCarrierLocker(FleetCarrier.LockerType.Assets);
+                        if (v != null)
+                        {
+                            richTextBox.AppendText("CarrierLocker.Assets: ");
+                            foreach (var s in v)
+                            {
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
+                            }
+                        }
+                        else
+                            richTextBox.AppendText("No CarrierLocker.Assets" + Environment.NewLine);
+                    }
+                    {
+                        var v = ep.GetCarrierLocker(FleetCarrier.LockerType.Goods);
+                        if (v != null)
+                        {
+                            richTextBox.AppendText("CarrierLocker.Goods: ");
+                            foreach (var s in v)
+                            {
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
+                            }
+                        }
+                        else
+                            richTextBox.AppendText("No CarrierLocker.Goods" + Environment.NewLine);
+                    }
+                    {
+                        var v = ep.GetCarrierLocker(FleetCarrier.LockerType.Data);
+                        if (v != null)
+                        {
+                            richTextBox.AppendText("CarrierLocker.Data: ");
+                            foreach (var s in v)
+                            {
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
+                            }
+                        }
+                        else
+                            richTextBox.AppendText("No CarrierLocker.Data" + Environment.NewLine);
+                    }
+
+                    {
+                        var rep = ep.GetReputation();
                         if (rep != null)
                         {
                             foreach (var v in rep)
-                                richTextBox.AppendText($"Reputation {v.Key} = {v.Value}" + Environment.NewLine);
+                                richTextBox.AppendText($"Reputation {v.Key} = {v.Value}" + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Rep" + Environment.NewLine);
                     }
 
                     {
-                        var imports = fc.Imports;
-                        if (imports != null)
+                        var modules = ep.GetModules();
+                        if (modules != null)
                         {
-                            richTextBox.AppendText("Imports" + Environment.NewLine);
-                            foreach (var kvp in imports)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
-                        }
-                        else
-                            richTextBox.AppendText("No Imports" + Environment.NewLine);
-
-                        var exports = fc.Exports;
-                        if (exports != null)
-                        {
-                            richTextBox.AppendText("exports" + Environment.NewLine);
-                            foreach (var kvp in exports)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
-                        }
-                        else
-                            richTextBox.AppendText("No Exports" + Environment.NewLine);
-
-                        var services = fc.Services;
-                        if (services != null)
-                        {
-                            richTextBox.AppendText("services" + Environment.NewLine);
-                            foreach (var kvp in services)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
-                        }
-                        else
-                            richTextBox.AppendText("Services null" + Environment.NewLine);
-
-                        var economies = fc.Economies;
-                        if (economies != null)
-                        {
-                            richTextBox.AppendText("economies" + Environment.NewLine);
-                            foreach (var kvp in economies)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
-                        }
-                        else
-                            richTextBox.AppendText("Economies null" + Environment.NewLine);
-
-                        var prohibit = fc.Prohibited;
-                        if (prohibit != null)
-                        {
-                            richTextBox.AppendText("prohibit" + Environment.NewLine);
-                            foreach (var kvp in prohibit)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
-                        }
-                        else
-                            richTextBox.AppendText("prohibit null" + Environment.NewLine);
-
-                        var commodities = fc.GetCommodities();
-                        if (commodities != null)
-                        {
-                            richTextBox.AppendText("Commds " + commodities.Count + Environment.NewLine);
-                            foreach (var s in commodities)
+                            richTextBox.AppendText("Modules: ");
+                            foreach (var s in modules)
                             {
-                                richTextBox.AppendText("        " + s.Name + " LN:" + s.LocName + " S:" + s.Sell + " B:" + s.Buy + " Stock:" + s.Stock + Environment.NewLine);
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
                             }
                         }
                         else
-                            richTextBox.AppendText("Commds null" + Environment.NewLine);
-                    }
-                    {
-                        var modules = fc.GetModules();
-                        if (modules != null)
-                        {
-                            richTextBox.AppendText("modules" + Environment.NewLine);
-                            foreach (var v in modules)
-                                richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.Category) + Environment.NewLine);
-                        }
-                        else
                             richTextBox.AppendText("modules null" + Environment.NewLine);
-                        var ships = fc.GetShips();
+
+                        var ships = ep.GetShips();
                         if (ships != null)
                         {
-                            richTextBox.AppendText("ships" + Environment.NewLine);
-                            foreach (var v in ships)
-                                richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.BaseValue) + Environment.NewLine);
+                            richTextBox.AppendText("Ships: ");
+                            foreach (var s in ships)
+                            {
+                                ReflectProperties(s, "  ", eol: ", ");
+                                richTextBox.AppendText(Environment.NewLine);
+                            }
                         }
                         else
                             richTextBox.AppendText("Shipyard null" + Environment.NewLine);
                     }
-
-
-                    richTextBox.ScrollToCaret();
                 }
                 else
                     richTextBox.AppendText("No Data" + Environment.NewLine);
+
+                richTextBox.AppendText("------------------------- /FLEET CARRIER" + Environment.NewLine);
+                richTextBox.ScrollToCaret();
             }
 
         }
@@ -572,87 +682,96 @@ namespace CAPIDemo
                     System.Diagnostics.Debug.WriteLine("Ship JSON" + json);
                 }
 
-                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
-                
-                Shipyard sy = p!=null ? new Shipyard(p) : null;
-                if (sy!=null && sy.IsValid)
+                richTextBox.AppendText("------------------------- SHIPYARD" + Environment.NewLine);
+
+                Shipyard ep = p!=null ? new Shipyard(p) : null;
+                if (ep!=null && ep.IsValid)
                 {
-                    ReflectProperties(sy, " ");
+                    ReflectProperties(ep, " ");
                     {
-                        var imports = sy.Imports;
+                        var imports = ep.Imports;
                         if (imports != null)
                         {
                             richTextBox.AppendText("Imports" + Environment.NewLine);
                             foreach (var kvp in imports)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
+
                         }
                         else
                             richTextBox.AppendText("No Imports" + Environment.NewLine);
                     }
+
                     {
-                        var exports = sy.Exports;
+                        var exports = ep.Exports;
                         if (exports != null)
                         {
                             richTextBox.AppendText("exports" + Environment.NewLine);
                             foreach (var kvp in exports)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Exports" + Environment.NewLine);
                     }
 
                     {
-                        var services = sy.Services;
+                        var services = ep.Services;
                         if (services != null)
                         {
                             richTextBox.AppendText("services" + Environment.NewLine);
                             foreach (var kvp in services)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Services" + Environment.NewLine);
                     }
+
                     {
-                        var economies = sy.Economies;
+                        var economies = ep.Economies;
                         if (economies != null)
                         {
                             richTextBox.AppendText("economies" + Environment.NewLine);
                             foreach (var kvp in economies)
-                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} = {1}", kvp.Key, kvp.Value) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Economies" + Environment.NewLine);
                     }
 
                     {
-                        var modules = sy.GetModules();
+                        var modules = ep.GetModules();
                         if (modules != null)
                         {
                             richTextBox.AppendText("modules" + Environment.NewLine);
                             foreach (var v in modules)
-                                richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.Category) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.Category) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Modules" + Environment.NewLine);
                     }
                     { 
-                        var ships = sy.GetShips();
+                        var ships = ep.GetShips();
                         if (ships != null)
                         {
                             richTextBox.AppendText("ships" + Environment.NewLine);
                             foreach (var v in ships)
-                                richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.BaseValue) + Environment.NewLine);
+                                richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.BaseValue) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
                         }
                         else
                             richTextBox.AppendText("No Ships" + Environment.NewLine);
                     }
-                    richTextBox.AppendText("---------------" + Environment.NewLine);
+
                 }
                 else
                     richTextBox.AppendText( "No Ship data" + Environment.NewLine);
 
+                richTextBox.AppendText("------------------------- /SHIPYARD" + Environment.NewLine);
                 richTextBox.ScrollToCaret();
-
             }
 
         }
@@ -663,7 +782,7 @@ namespace CAPIDemo
             {
                 string p = capi.Journal(dateTimePicker.Value, out System.Net.HttpStatusCode status);
 
-                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+                richTextBox.AppendText("------------------------- JOURNAL" + Environment.NewLine);
                 richTextBox.AppendText( "Journal Response " + status + Environment.NewLine);
 
                 if (p != null)
@@ -671,6 +790,7 @@ namespace CAPIDemo
                     File.WriteAllText(rootpath+"\\journal.json", p);
                 }
 
+                richTextBox.AppendText("------------------------- /JOURNAL" + Environment.NewLine);
                 richTextBox.ScrollToCaret();
             }
 
@@ -683,15 +803,16 @@ namespace CAPIDemo
             {
                 string p = capi.CommunityGoals();
 
-                richTextBox.AppendText( "-------------------------" + Environment.NewLine);
+                richTextBox.AppendText("------------------------- COMMUNITY GOALS" + Environment.NewLine);
 
                 if (p != null)
                 {
                     File.WriteAllText(rootpath+"\\communitygoals.json", p);
-                    richTextBox.AppendText( "Community Goals" + p + Environment.NewLine);
+                    richTextBox.AppendText( p + Environment.NewLine);
                     richTextBox.ScrollToCaret();
                 }
 
+                richTextBox.AppendText("------------------------- /COMMUNITY GOALS" + Environment.NewLine);
             }
 
         }
@@ -702,19 +823,22 @@ namespace CAPIDemo
         }
 
 
-        void ReflectProperties(Object fc, string prefix = " ", string secondprefix = null)
+        void ReflectProperties(Object fc, string prefix = " ", string secondprefix = null, string eol = "\r\n")
         {
             if (secondprefix == null)
                 secondprefix = prefix;
 
             foreach (System.Reflection.PropertyInfo pi in fc.GetType().GetProperties())
             {
-                System.Reflection.MethodInfo getter = pi.GetGetMethod();
-                Object value = getter.Invoke(fc, null);
-                if (value != null)
+                if (!pi.PropertyType.FullName.Contains("Generic."))
                 {
-                    richTextBox.AppendText(prefix + pi.Name + " = " + value.ToString() + Environment.NewLine);
-                    prefix = secondprefix;
+                    System.Reflection.MethodInfo getter = pi.GetGetMethod();
+                    Object value = getter.Invoke(fc, null);
+                    if (value != null)
+                    {
+                        richTextBox.AppendText(prefix + pi.Name + " = " + value.ToString() + eol);
+                        prefix = secondprefix;
+                    }
                 }
 
             }
