@@ -43,7 +43,7 @@ namespace CAPI
         public string State { get { return json["state"].StrNull(); } }
         public string Theme { get { return json["theme"].StrNull(); } }
         public string DockingAccess { get { return json["dockingAccess"].StrNull(); } }
-        public bool NotoriusAccess { get { return json["notoriousAccess"].Bool(false); } }
+        public bool NotoriousAccess { get { return json["notoriousAccess"].Bool(false); } }
 
         // Capacity
 
@@ -115,14 +115,15 @@ namespace CAPI
 
         public long BankBalance { get { return json["finance"].I("bankBalance").Long(0); } }
         public long BankReservedBalance { get { return json["finance"].I("bankReservedBalance").Long(0); } }
-        public double Taxation { get { return json["finance"].I("taxation").Double(0); } }
-        public double ServiceTaxationBartender { get { return json["finance"].I("service_taxation").I("bartender").Double(0); } }
+
+        // not in use public double Taxation { get { return json["finance"].I("taxation").Double(0); } }
+        // not in use. public double ServiceTaxationBartender { get { return json["finance"].I("service_taxation").I("bartender").Double(0); } }
         public double ServiceTaxationPioneer { get { return json["finance"].I("service_taxation").I("pioneersupplies").Double(0); } }
         public double ServiceTaxationRearm { get { return json["finance"].I("service_taxation").I("rearm").Double(0); } }
         public double ServiceTaxationRefuel { get { return json["finance"].I("service_taxation").I("refuel").Double(0); } }
         public double ServiceTaxationRepair { get { return json["finance"].I("service_taxation").I("repair").Double(0); } }
         public double ServiceTaxationShipYard { get { return json["finance"].I("service_taxation").I("shipyard").Double(0); } }
-        public double ServiceTaxationOutFitting { get { return json["finance"].I("service_taxation").I("outfitting").Double(0); } }
+        public double ServiceTaxationutFitting { get { return json["finance"].I("service_taxation").I("outfitting").Double(0); } }
         public int ServicesCount { get { return json["finance"].I("numServices").Int(0); } }
         public int ServicesOptionalCount { get { return json["finance"].I("numOptionalServices").Int(0); } }
         public long DebtThreshold { get { return json["finance"].I("debtThreshold").Long(0); } }
@@ -276,6 +277,7 @@ namespace CAPI
             public string Name { get; set; }
             public int Quantity { get; set; }
             public string LocName { get; set; }
+            public LockerType Category { get; set; } 
         }
 
         public enum LockerType { Assets, Goods, Data}
@@ -292,6 +294,7 @@ namespace CAPI
                     c.Quantity = entry["quantity"].Int();
                     c.Name = entry["name"].Str();
                     c.LocName = entry["locName"].Str("Unknown");
+                    c.Category = t;
                     cargo.Add(c);
                 }
                 return cargo;
@@ -299,6 +302,22 @@ namespace CAPI
             return null;
         }
 
+        public List<LockerItem> GetCarrierLockerAll()
+        {
+            var a = GetCarrierLocker(LockerType.Assets);
+            var g = GetCarrierLocker(LockerType.Goods);
+            var d = GetCarrierLocker(LockerType.Data);
+
+            List<LockerItem> merged = new List<LockerItem>();
+            if (a != null)
+                merged.AddRange(a);
+            if (g != null)
+                merged.AddRange(g);
+            if (d != null)
+                merged.AddRange(d);
+
+            return merged;
+        }
 
         // reputation
 

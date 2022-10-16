@@ -30,6 +30,8 @@ namespace CAPI
             json = JToken.Parse(profile, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL);
         }
 
+        public JToken Json { get { return json; } }
+
         public class Commodity
         {
             public string Name{get;set;}
