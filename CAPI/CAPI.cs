@@ -397,30 +397,30 @@ namespace CAPI
 
         // obtain market end point - may return null
 
-        public string Market()
+        public string Market(bool nocontentreturnemptystring = false)
         {
-            return Get(MARKET_URL, out HttpStatusCode unused);
+            return Get(MARKET_URL, out HttpStatusCode unused, nocontentreturnemptystring);
         }
 
         // obtain shipyard end point - may return null
 
-        public string Shipyard()
+        public string Shipyard(bool nocontentreturnemptystring = false)
         {
-            return Get(SHIPYARD_URL, out HttpStatusCode unused);
+            return Get(SHIPYARD_URL, out HttpStatusCode unused, nocontentreturnemptystring);
         }
 
         // obtain fleetcarrier end point - may return null
 
-        public string FleetCarrier()
+        public string FleetCarrier(bool nocontentreturnemptystring = false)
         {
-            return Get(FLEETCARRIER_URL, out HttpStatusCode unused);
+            return Get(FLEETCARRIER_URL, out HttpStatusCode unused, nocontentreturnemptystring);
         }
 
         // obtain CG end point - may return null
         
-        public string CommunityGoals()
+        public string CommunityGoals(bool nocontentreturnemptystring = false)
         {
-            return Get(COMMUNITYGOALS_URL, out HttpStatusCode unused);
+            return Get(COMMUNITYGOALS_URL, out HttpStatusCode unused, nocontentreturnemptystring);
         }
 
         // obtain journal on date
@@ -459,7 +459,7 @@ namespace CAPI
         // status = Unauthorized = oAuth not working, refresh token not working, or login required
         // or status code from server
 
-        private string Get(string endpoint, out HttpStatusCode status)
+        private string Get(string endpoint, out HttpStatusCode status, bool nocontentreturnemptystring = false)
         {
             lock (Credentials)          // we lock here so two threads can't alter the login/credientials at the same time
             {
@@ -503,6 +503,11 @@ namespace CAPI
                         if (response.StatusCode == HttpStatusCode.Found)
                         {
                             return null;
+                        }
+
+                        if ( response.StatusCode == HttpStatusCode.NoContent && nocontentreturnemptystring)
+                        {
+                            return "";
                         }
 
                         return getResponseData(response);
