@@ -75,6 +75,7 @@ namespace CAPI
         public UserState GetUserState(string username)
         {
             string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
+            System.Diagnostics.Debug.WriteLine($"CAPI - User state of commander {username} at {credfile}");
             if (File.Exists(credfile))
             {
                 var credentials = CompanionAppCredentials.Load(credfile);
@@ -89,6 +90,8 @@ namespace CAPI
         public bool LogOut(string username)
         {
             string credfile = Path.Combine(credentialpath, SafeFileString(username) + ".cred");
+            System.Diagnostics.Debug.WriteLine($"CAPI - Logout of commander {username} at {credfile}");
+
             if (File.Exists(credfile))
             {
                 try
@@ -112,6 +115,7 @@ namespace CAPI
 
         public bool LogIn(string username)           
         {
+            System.Diagnostics.Debug.WriteLine($"CAPI - Login of commander {username}");
             if (!ClientIDAvailable)                                 // must have an ID, else service is disabled
                 return false;
 
@@ -474,8 +478,6 @@ namespace CAPI
                 if (!Active)
                     return null;
 
-                string serverurl = CAPIURI;
-
                 if (Credentials.Expired)
                 {
                     try
@@ -498,6 +500,8 @@ namespace CAPI
                 // we have access..
                 System.Diagnostics.Debug.Assert(CurrentState == State.Authorized);
 
+                string serverurl = CAPIURI;
+                System.Diagnostics.Debug.WriteLine($"CAPI - request {serverurl} {endpoint}");
                 HttpWebRequest request = GetRequest(serverurl + endpoint);
 
                 try
