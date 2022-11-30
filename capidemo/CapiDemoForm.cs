@@ -71,7 +71,7 @@ namespace CAPIDemo
         {
             capi.LogIn("one");
             richTextBox.AppendText( "-------------------------" + Environment.NewLine);
-            richTextBox.AppendText( "Login One" + Environment.NewLine);
+            richTextBox.AppendText($"Login One: {capi.CAPIServer} {capi.CAPIURI}" + Environment.NewLine);
             richTextBox.ScrollToCaret();
         }
 
@@ -79,7 +79,7 @@ namespace CAPIDemo
         {
             capi.LogIn("two:user");
             richTextBox.AppendText( "-------------------------" + Environment.NewLine);
-            richTextBox.AppendText( "Login Two" + Environment.NewLine);
+            richTextBox.AppendText($"Login Two: {capi.CAPIServer} {capi.CAPIURI}" + Environment.NewLine);
             richTextBox.ScrollToCaret();
         }
 
@@ -107,7 +107,7 @@ namespace CAPIDemo
                 Profile pf = p != null ? new Profile(p) : null;
                 if (pf != null && pf.IsValid)
                 {
-                    ReflectProperties(pf, " ", eol:", ");
+                    ReflectProperties(pf, " ", eol:Environment.NewLine);
                     richTextBox.AppendText(Environment.NewLine);
 
                     var ml = pf.GetShipModules();
@@ -819,7 +819,11 @@ namespace CAPIDemo
 
         private void checkBoxBeta_CheckedChanged(object sender, EventArgs e)
         {
-            capi.GameIsBeta = checkBoxBeta.Checked;
+            capi.CAPIServer = CompanionAPI.CAPIServerType.Beta;
+        }
+        private void checkBoxLegacy_CheckedChanged(object sender, EventArgs e)
+        {
+            capi.CAPIServer = CompanionAPI.CAPIServerType.Legacy;
         }
 
 
@@ -849,5 +853,6 @@ namespace CAPIDemo
         {
             richTextBox.Clear();
         }
+
     }
 }

@@ -40,11 +40,12 @@
             this.buttonFleetCarrier = new System.Windows.Forms.Button();
             this.buttonCG = new System.Windows.Forms.Button();
             this.checkBoxBeta = new System.Windows.Forms.CheckBox();
+            this.checkBoxLegacy = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // buttonLoginOne
             // 
-            this.buttonLoginOne.Location = new System.Drawing.Point(47, 34);
+            this.buttonLoginOne.Location = new System.Drawing.Point(47, 54);
             this.buttonLoginOne.Name = "buttonLoginOne";
             this.buttonLoginOne.Size = new System.Drawing.Size(75, 28);
             this.buttonLoginOne.TabIndex = 0;
@@ -54,7 +55,7 @@
             // 
             // buttonProfile
             // 
-            this.buttonProfile.Location = new System.Drawing.Point(47, 127);
+            this.buttonProfile.Location = new System.Drawing.Point(47, 147);
             this.buttonProfile.Name = "buttonProfile";
             this.buttonProfile.Size = new System.Drawing.Size(75, 23);
             this.buttonProfile.TabIndex = 1;
@@ -64,7 +65,7 @@
             // 
             // buttonMarket
             // 
-            this.buttonMarket.Location = new System.Drawing.Point(47, 156);
+            this.buttonMarket.Location = new System.Drawing.Point(47, 176);
             this.buttonMarket.Name = "buttonMarket";
             this.buttonMarket.Size = new System.Drawing.Size(75, 23);
             this.buttonMarket.TabIndex = 2;
@@ -86,7 +87,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(47, 387);
+            this.button4.Location = new System.Drawing.Point(47, 407);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 2;
@@ -96,7 +97,7 @@
             // 
             // buttonShipYard
             // 
-            this.buttonShipYard.Location = new System.Drawing.Point(47, 185);
+            this.buttonShipYard.Location = new System.Drawing.Point(47, 205);
             this.buttonShipYard.Name = "buttonShipYard";
             this.buttonShipYard.Size = new System.Drawing.Size(75, 23);
             this.buttonShipYard.TabIndex = 2;
@@ -106,7 +107,7 @@
             // 
             // buttonLoginTwo
             // 
-            this.buttonLoginTwo.Location = new System.Drawing.Point(47, 79);
+            this.buttonLoginTwo.Location = new System.Drawing.Point(47, 99);
             this.buttonLoginTwo.Name = "buttonLoginTwo";
             this.buttonLoginTwo.Size = new System.Drawing.Size(75, 28);
             this.buttonLoginTwo.TabIndex = 0;
@@ -116,7 +117,7 @@
             // 
             // buttonJournal
             // 
-            this.buttonJournal.Location = new System.Drawing.Point(47, 335);
+            this.buttonJournal.Location = new System.Drawing.Point(47, 355);
             this.buttonJournal.Name = "buttonJournal";
             this.buttonJournal.Size = new System.Drawing.Size(75, 23);
             this.buttonJournal.TabIndex = 2;
@@ -127,14 +128,14 @@
             // dateTimePicker
             // 
             this.dateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePicker.Location = new System.Drawing.Point(21, 309);
+            this.dateTimePicker.Location = new System.Drawing.Point(21, 329);
             this.dateTimePicker.Name = "dateTimePicker";
             this.dateTimePicker.Size = new System.Drawing.Size(101, 20);
             this.dateTimePicker.TabIndex = 4;
             // 
             // buttonFleetCarrier
             // 
-            this.buttonFleetCarrier.Location = new System.Drawing.Point(47, 214);
+            this.buttonFleetCarrier.Location = new System.Drawing.Point(47, 234);
             this.buttonFleetCarrier.Name = "buttonFleetCarrier";
             this.buttonFleetCarrier.Size = new System.Drawing.Size(75, 23);
             this.buttonFleetCarrier.TabIndex = 2;
@@ -144,7 +145,7 @@
             // 
             // buttonCG
             // 
-            this.buttonCG.Location = new System.Drawing.Point(47, 243);
+            this.buttonCG.Location = new System.Drawing.Point(47, 263);
             this.buttonCG.Name = "buttonCG";
             this.buttonCG.Size = new System.Drawing.Size(75, 23);
             this.buttonCG.TabIndex = 2;
@@ -155,7 +156,7 @@
             // checkBoxBeta
             // 
             this.checkBoxBeta.AutoSize = true;
-            this.checkBoxBeta.Location = new System.Drawing.Point(64, 11);
+            this.checkBoxBeta.Location = new System.Drawing.Point(82, 15);
             this.checkBoxBeta.Name = "checkBoxBeta";
             this.checkBoxBeta.Size = new System.Drawing.Size(48, 17);
             this.checkBoxBeta.TabIndex = 5;
@@ -163,11 +164,23 @@
             this.checkBoxBeta.UseVisualStyleBackColor = true;
             this.checkBoxBeta.CheckedChanged += new System.EventHandler(this.checkBoxBeta_CheckedChanged);
             // 
+            // checkBoxLegacy
+            // 
+            this.checkBoxLegacy.AutoSize = true;
+            this.checkBoxLegacy.Location = new System.Drawing.Point(11, 15);
+            this.checkBoxLegacy.Name = "checkBoxLegacy";
+            this.checkBoxLegacy.Size = new System.Drawing.Size(61, 17);
+            this.checkBoxLegacy.TabIndex = 5;
+            this.checkBoxLegacy.Text = "Legacy";
+            this.checkBoxLegacy.UseVisualStyleBackColor = true;
+            this.checkBoxLegacy.CheckedChanged += new System.EventHandler(this.checkBoxLegacy_CheckedChanged);
+            // 
             // CapiDemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1494, 1055);
+            this.Controls.Add(this.checkBoxLegacy);
             this.Controls.Add(this.checkBoxBeta);
             this.Controls.Add(this.dateTimePicker);
             this.Controls.Add(this.richTextBox);
@@ -201,6 +214,7 @@
         private System.Windows.Forms.Button buttonFleetCarrier;
         private System.Windows.Forms.Button buttonCG;
         private System.Windows.Forms.CheckBox checkBoxBeta;
+        private System.Windows.Forms.CheckBox checkBoxLegacy;
     }
 }
 

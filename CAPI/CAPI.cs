@@ -1,7 +1,7 @@
 ﻿/*
  * Original Code from EDDI https://github.com/EDCD/EDDI Thanks for the EDDI team for this
  * 
- * Modified code Copyright © 2021 Robby & EDDiscovery development team
+ * Modified code Copyright © 2022 Robby & EDDiscovery development team
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
  * file except in compliance with the License. You may obtain a copy of the License at
@@ -12,8 +12,6 @@
  * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
  * ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
- * 
- * EDDiscovery is not affiliated with Frontier Developments plc.
  */
 
 using System;
@@ -52,7 +50,15 @@ namespace CAPI
         public string URI { get; private set; }                         // URI for callback
         public string UserAgentNameVersion { get; private set; }        // GreatProgram-1.2.3.4
 
-        public bool GameIsBeta { get; set; } = false;           // call to set to beta server
+        public enum CAPIServerType
+        {
+            Live,
+            Legacy,
+            Beta,
+        }
+
+        public CAPIServerType CAPIServer { get; set; } = CAPIServerType.Live;    
+        public string CAPIURI { get { return CAPIServer == CAPIServerType.Live ? LIVE_SERVER : CAPIServer == CAPIServerType.Legacy ? LEGACY_SERVER : BETA_SERVER; } }
             
         public CompanionAPI(string credentialpath, string clientinfo, string useragent, string uri)
         {
@@ -468,7 +474,7 @@ namespace CAPI
                 if (!Active)
                     return null;
 
-                string serverurl = GameIsBeta ? BETA_SERVER : LIVE_SERVER;
+                string serverurl = CAPIURI;
 
                 if (Credentials.Expired)
                 {
@@ -593,8 +599,10 @@ namespace CAPI
             return normal;
         }
 
-        // Implementation instructions from Frontier: https://hosting.zaonce.net/docs/oauth2/instructions.html
+        // Implementation instructions from Frontier: https://hosting.zaonce.net/docs/oauth2/instructions.html, 
+        // with Legacy server from the Update 14 info
         private static readonly string LIVE_SERVER = "https://companion.orerve.net";
+        private static readonly string LEGACY_SERVER = "https://legacy-companion.orerve.net/";
         private static readonly string BETA_SERVER = "https://pts-companion.orerve.net";
         private static readonly string AUTH_SERVER = "https://auth.frontierstore.net";
 
