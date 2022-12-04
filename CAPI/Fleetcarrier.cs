@@ -37,7 +37,7 @@ namespace CAPI
         public string FilteredName { get { return json["name"].I("filteredVanityName").StrNull()?.FromHexString(); } }
         public string CallSign { get { return json["name"].I("callsign").StrNull(); } }
 
-       public string StarSystem { get { return json["currentStarSystem"].StrNull(); } }
+        public string StarSystem { get { return json["currentStarSystem"].StrNull(); } }
         public long Balance { get { return json["balance"].Str("0").InvariantParseLong(0); } }  // strange frontier uses strings
         public int Fuel { get { return json["fuel"].Str("0").InvariantParseInt(0); } } // strange frontier uses strings
         public string State { get { return json["state"].StrNull(); } }
@@ -75,11 +75,11 @@ namespace CAPI
         public List<Itinerary> GetCompletedItinerary()
         {
             JArray list = json["itinerary"].I("completed").Array();
-            
+
             if (list != null)
             {
                 List<Itinerary> it = new List<Itinerary>();
-                foreach ( var e in list)
+                foreach (var e in list)
                 {
                     Itinerary i = new Itinerary();
                     i.DepartureTime = e["departureTime"].DateTimeUTC();
@@ -161,14 +161,14 @@ namespace CAPI
             public long CrewMemberSalary { get; set; }
             public long CrewMemberHiringPrice { get; set; } // -1 for 'null'
             public DateTime CrewMemberLastEdit { get; set; }
-            public List <Invoice> Invoices { get; set; }
+            public List<Invoice> Invoices { get; set; }
         };
 
         // Crew service state. Will be null when no services are activated (default state)
         public Dictionary<string, CrewService> GetCrewServices()
         {
             JObject services = json["servicesCrew"].Object();
-            if (services != null && services.Count>0)
+            if (services != null && services.Count > 0)
             {
                 Dictionary<string, CrewService> ret = new Dictionary<string, CrewService>();
                 foreach (var kvp in services)
@@ -191,7 +191,7 @@ namespace CAPI
                         {
                             s.Invoices = new List<Invoice>();
 
-                            foreach( var entry in inv)
+                            foreach (var entry in inv)
                             {
                                 Invoice i = new Invoice();
                                 i.Wages = entry["wages"].Long(0);
@@ -214,7 +214,8 @@ namespace CAPI
 
         // Cargo
 
-        public class Cargo
+        [System.Diagnostics.DebuggerDisplay("{Commodity} v{Value} q{Quantity} m{Mission} s{Stolen}")]
+        public class Cargo : IComparable
         {
             public string Commodity { get; set; }
             public bool Mission { get; set; }
@@ -222,16 +223,30 @@ namespace CAPI
             public long Value { get; set; }
             public bool Stolen { get; set; }
             public string LocName { get; set; }
-        };
+
+            public int CompareTo(object obj)
+            {
+                Cargo o = obj as Cargo;
+                int v = Commodity.CompareTo(o.Commodity);
+                if (v != 0)
+                    return v;
+                else if (o.Value != Value)
+                    return o.Value.CompareTo(Value);
+                else if (o.Mission != Mission)
+                    return Mission.CompareTo(o.Mission);
+                else
+                    return o.Stolen.CompareTo(Stolen);
+            }
+        }
 
         // This is what is on board the carrier, including items for sale.  Items may be repeated
         public List<Cargo> GetCargo()
         {
             JArray clist = json["cargo"].Array();
-            if ( clist != null && clist.Count > 0 )
+            if (clist != null && clist.Count > 0)
             {
                 List<Cargo> cargo = new List<Cargo>();
-                foreach( var entry in clist)
+                foreach (var entry in clist)
                 {
                     Cargo c = new Cargo();
                     c.Commodity = entry["commodity"].Str("Unknown");
@@ -246,6 +261,33 @@ namespace CAPI
             }
             return null;
         }
+
+        // merge entries with same name/value/flags together
+        static public List<Cargo> MergeCargo(List<Cargo> list)
+        {
+            var todel = new List<Cargo>();
+            foreach( Cargo c in list)
+            {
+                while(!todel.Contains(c))   // don't process deleted ones
+                {
+                    // find the next in the list the same as c, but not the same item, and not on the del list
+                    var other = list.Find(x => x.CompareTo(c) == 0 && !Object.ReferenceEquals(x, c) && !todel.Contains(x));
+                    if (other != null)
+                    {
+                        c.Quantity += other.Quantity;
+                        todel.Add(other);
+                    }
+                    else
+                        break;
+                }
+            }
+
+            foreach (var x in todel)
+                list.Remove(x);
+
+            return list;
+        }
+
 
         // orders - what is on sale or to purchase.
         // For commodities : Includes items from both the Carrier Commodity Trading (with blackmarket = false) and Secure Trading (blackmarket=true)
