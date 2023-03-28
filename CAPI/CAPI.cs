@@ -610,7 +610,7 @@ namespace CAPI
         private static readonly string BETA_SERVER = "https://pts-companion.orerve.net";
         private static readonly string AUTH_SERVER = "https://auth.frontierstore.net";
 
-        private static readonly string SCOPE = "scope=capi";
+        private static readonly string SCOPE = "scope=capi auth";
         private static readonly string AUDIENCE = "audience=all"; 
         private static readonly string AUTH_URL = "/auth";      
         private static readonly string TOKEN_URL = "/token";    

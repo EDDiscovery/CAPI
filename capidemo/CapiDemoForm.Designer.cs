@@ -194,7 +194,7 @@
             this.Controls.Add(this.buttonLoginTwo);
             this.Controls.Add(this.buttonLoginOne);
             this.Name = "CapiDemoForm";
-            this.Text = "Form1";
+            this.Text = "Frontiers Crapi";
             this.ResumeLayout(false);
             this.PerformLayout();
 
