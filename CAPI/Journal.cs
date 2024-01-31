@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright © 2021 Robby & EDDiscovery development team
+ * Copyright © 2021-2024 Robby & EDDiscovery development team
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
  * file except in compliance with the License. You may obtain a copy of the License at
@@ -10,15 +10,12 @@
  * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
  * ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
- * 
- * EDDiscovery is not affiliated with Frontier Developments plc.
  */
 
  //#define CONSOLETESTHARNESS
 
 using QuickJSON;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace CAPI
@@ -31,11 +28,10 @@ namespace CAPI
     //set up journal files for each day in c:\code\journal.21-03-13.log
     //enable
 
-
-
     public partial class CompanionAPI
     {
-        public JObject ManageJournalDownload(JObject lasthistory, string storepath, string cmdrname, TimeSpan checktime, int daysinpast )
+        public JObject ManageJournalDownload(JObject lasthistory, string storepath, string cmdrname, TimeSpan checktime, int daysinpast, 
+                            Action<string> reportback = null, int pauseformessage = 1 )
         {
             //System.Diagnostics.Debug.WriteLine("---------------------- Journal console check @ " + DateTime.UtcNow.ToStringZulu());
 
@@ -71,6 +67,7 @@ namespace CAPI
 
             if (todo != null)          // found one to try
             {
+                reportback?.Invoke("CAPI Journal check " + todo);
                 System.Diagnostics.Trace.WriteLine("Journal Check day " + todo + " @ " + DateTime.UtcNow.ToStringZulu());
 
                 string journaljson = null;
@@ -93,6 +90,7 @@ namespace CAPI
                 if (status == System.Net.HttpStatusCode.NoContent)
                 {
                     // server says no content for the day. If its a previous day, its over. Else we are in check1 continuously because the game might start
+                    reportback?.Invoke("CAPI Journal no content on server for " + todo);
 
                     newhistory[todo] = new JObject() { ["S"] = todo==dayzeroname ? "Check1" : "NoContent", ["T"] = DateTime.UtcNow.ToStringZulu() };
                 }
@@ -183,11 +181,13 @@ namespace CAPI
 
                     if (newoutput.HasChars())       // we have new data, so we go into check1 and it will be downloaded again later
                     {
+                        reportback?.Invoke("CAPI Journal records found for " + todo);
                         System.Diagnostics.Trace.WriteLine(string.Format("..{0} New content for {1}", todo, filename));
                         System.IO.File.WriteAllText(filename, (prevcontent ?? "") + newoutput);
                     }
                     else
                     {
+                        reportback?.Invoke("CAPI Journal no new records found for " + todo);
                         System.Diagnostics.Trace.WriteLine(string.Format("..{0} No change for {1}", todo, filename));
                         string instate = lasthistory[todo].I("S").Str("NotTried");
 
@@ -203,9 +203,13 @@ namespace CAPI
                 }
                 else
                 {
+                    reportback?.Invoke("CAPI Journal no response from server");
                     System.Diagnostics.Trace.WriteLine("  No response to " + todo + " (" + status.ToString() + ") will try again");
                 }
             }
+
+            System.Threading.Thread.Sleep(pauseformessage);     // small pause to let message show
+            reportback?.Invoke("");
 
             //System.Diagnostics.Debug.WriteLine("--------------- finished " + newhistory.ToString());
 
