@@ -385,15 +385,17 @@ namespace CAPI
 
         // obtain profile end point - we cache it for 30 seconds to reduce requests.  May return null if not available
 
-        public string Profile(bool forceRefresh = false)
+        public string Profile(out DateTime servertime, bool forceRefresh = false)
         {
+            servertime = DateTime.MinValue;
+
             if (!forceRefresh && cachedProfile != null && cachedProfileExpires > DateTime.UtcNow)
             {
                 //System.Diagnostics.Debug.WriteLine("Returning cached profile");
             }
             else
             {
-                string v = Get(PROFILE_URL, out HttpStatusCode unused);
+                string v = Get(PROFILE_URL, out HttpStatusCode _, out servertime);
                 cachedProfile = v;                                                  // single point set, should be thread safe.
 
                 if (cachedProfile != null)
@@ -407,30 +409,30 @@ namespace CAPI
 
         // obtain market end point - may return null
 
-        public string Market(bool nocontentreturnemptystring = false)
+        public string Market(out DateTime servertime, bool nocontentreturnemptystring = false)
         {
-            return Get(MARKET_URL, out HttpStatusCode unused, nocontentreturnemptystring);
+            return Get(MARKET_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
         }
 
         // obtain shipyard end point - may return null
 
-        public string Shipyard(bool nocontentreturnemptystring = false)
+        public string Shipyard(out DateTime servertime, bool nocontentreturnemptystring = false)
         {
-            return Get(SHIPYARD_URL, out HttpStatusCode unused, nocontentreturnemptystring);
+            return Get(SHIPYARD_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
         }
 
         // obtain fleetcarrier end point - may return null
 
-        public string FleetCarrier(bool nocontentreturnemptystring = false)
+        public string FleetCarrier(out DateTime servertime, bool nocontentreturnemptystring = false)
         {
-            return Get(FLEETCARRIER_URL, out HttpStatusCode unused, nocontentreturnemptystring);
+            return Get(FLEETCARRIER_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
         }
 
         // obtain CG end point - may return null
         
-        public string CommunityGoals(bool nocontentreturnemptystring = false)
+        public string CommunityGoals(out DateTime servertime, bool nocontentreturnemptystring = false)
         {
-            return Get(COMMUNITYGOALS_URL, out HttpStatusCode unused, nocontentreturnemptystring);
+            return Get(COMMUNITYGOALS_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
         }
 
         // obtain journal on date
@@ -446,7 +448,7 @@ namespace CAPI
 
         public string Journal(string date, out HttpStatusCode status)       // date is in yyyy/mm/dd or yyyy-mm-dd format
         {
-            var s = Get(JOURNAL_URL + "/" + date.Replace("-","/") , out status);
+            var s = Get(JOURNAL_URL + "/" + date.Replace("-","/") , out status, out _);
             if ( s != null)
             {
                 // if OK/Jorunal unavailable or empty object, fix output to null, thanks Artie.
@@ -469,11 +471,12 @@ namespace CAPI
         // status = Unauthorized = oAuth not working, refresh token not working, or login required
         // or status code from server
 
-        private string Get(string endpoint, out HttpStatusCode status, bool nocontentreturnemptystring = false)
+        private string Get(string endpoint, out HttpStatusCode status, out DateTime servertime, bool nocontentreturnemptystring = false)
         {
             lock (Credentials)          // we lock here so two threads can't alter the login/credientials at the same time
             {
                 status = HttpStatusCode.Unauthorized;
+                servertime = DateTime.MinValue;
 
                 if (!Active)
                     return null;
@@ -519,6 +522,10 @@ namespace CAPI
                         {
                             return "";
                         }
+
+                        var datetimehdr = response.Headers["Date"];
+                        if (datetimehdr != null && DateTime.TryParse(datetimehdr, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal | System.Globalization.DateTimeStyles.AdjustToUniversal, out DateTime res))
+                            servertime = res;
 
                         return getResponseData(response);
                     }

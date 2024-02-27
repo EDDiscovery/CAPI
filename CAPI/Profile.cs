@@ -13,6 +13,7 @@
  */
 
 using QuickJSON;
+using System;
 using System.Collections.Generic;
 
 namespace CAPI
@@ -21,11 +22,13 @@ namespace CAPI
 
     public class Profile
     {
-        public Profile(string profile)
+        public Profile(string profile,DateTime servertime)
         {
             json = JToken.Parse(profile, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL);
+            ServerTimeUTC = servertime;
         }
 
+        public DateTime ServerTimeUTC { get; set; }
         public bool IsValid { get { return json != null && ID != long.MinValue && Commander != null; } }
 
         // Commander

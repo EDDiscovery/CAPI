@@ -93,7 +93,7 @@ namespace CAPIDemo
         {
             if (capi.Active)
             {
-                string p = capi.Profile();
+                string p = capi.Profile(out DateTime servertime);
 
                 if (p != null)
                 {
@@ -104,7 +104,7 @@ namespace CAPIDemo
 
                 richTextBox.AppendText("------------------------- PROFILE" + Environment.NewLine);
 
-                Profile pf = p != null ? new Profile(p) : null;
+                Profile pf = p != null ? new Profile(p,servertime) : null;
                 if (pf != null && pf.IsValid)
                 {
                     ReflectProperties(pf, " ", eol:Environment.NewLine);
@@ -192,7 +192,7 @@ namespace CAPIDemo
         {
             if (capi.Active)
             {
-                string p = capi.Market();
+                string p = capi.Market(out DateTime servertime);
 
                 if (p != null)
                 {
@@ -203,7 +203,7 @@ namespace CAPIDemo
 
                 richTextBox.AppendText("------------------------- MARKET" + Environment.NewLine);
 
-                Market ep = p != null ? new Market(p) : null;
+                Market ep = p != null ? new Market(p,servertime) : null;
                 //Market mk = new Market(File.ReadAllText(@"c:\code\logs\capi\market-default(1).json")); // debug
 
                 if (ep != null && ep.IsValid)
@@ -368,18 +368,18 @@ namespace CAPIDemo
 
                 if (!debugfile)
                 {
-                    string p = capi.FleetCarrier();
+                    string p = capi.FleetCarrier(out DateTime servertime);
                     if (p != null)
                     {
                         string json = JToken.Parse(p, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL).ToString(true);
                         File.WriteAllText(rootpath + "\\fleetcarrierdata.json", json);
                         System.Diagnostics.Debug.WriteLine("Fleet JSON" + json);
-                        ep = new FleetCarrier(p);
+                        ep = new FleetCarrier(p,servertime);
                     }
                 }
                 else
                 {
-                    ep = new FleetCarrier(File.ReadAllText(@"c:\code\fleetcarrier.json")); // debug
+                    ep = new FleetCarrier(File.ReadAllText(@"c:\code\fleetcarrier.json"),DateTime.UtcNow); // debug
                 }
 
                 richTextBox.AppendText("------------------------- FLEET CARRIER" + Environment.NewLine);
@@ -673,7 +673,7 @@ namespace CAPIDemo
         {
             if (capi.Active)
             {
-                string p = capi.Shipyard();
+                string p = capi.Shipyard(out DateTime servertime);
 
                 if (p != null)
                 {
@@ -684,7 +684,7 @@ namespace CAPIDemo
 
                 richTextBox.AppendText("------------------------- SHIPYARD" + Environment.NewLine);
 
-                Shipyard ep = p!=null ? new Shipyard(p) : null;
+                Shipyard ep = p!=null ? new Shipyard(p,servertime) : null;
                 if (ep!=null && ep.IsValid)
                 {
                     ReflectProperties(ep, " ");
@@ -801,7 +801,7 @@ namespace CAPIDemo
         {
             if (capi.Active)
             {
-                string p = capi.CommunityGoals();
+                string p = capi.CommunityGoals(out DateTime servertime);
 
                 richTextBox.AppendText("------------------------- COMMUNITY GOALS" + Environment.NewLine);
 

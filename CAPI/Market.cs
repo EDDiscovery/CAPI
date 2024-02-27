@@ -26,9 +26,10 @@ namespace CAPI
 
     public class Market : CAPIEndPointBaseClass
     {
-        public Market(string profile) : base(profile)
+        public Market(string profile, DateTime servertime) : base(profile,servertime)
         {
         }
+
 
         public bool IsValid { get { return json != null && ID != long.MinValue && Name != null; } }
 

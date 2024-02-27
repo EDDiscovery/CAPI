@@ -23,7 +23,7 @@ namespace CAPI
 
     public class FleetCarrier : CAPIEndPointBaseClass
     {
-        public FleetCarrier(string profile) : base(profile)
+        public FleetCarrier(string profile, DateTime servertime) : base(profile,servertime)
         {
         }
 
