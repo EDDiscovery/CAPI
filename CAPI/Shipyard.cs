@@ -25,7 +25,7 @@ namespace CAPI
 
     public class Shipyard : CAPIEndPointBaseClass
     {
-        public Shipyard(string profile, DateTime servertime) : base(profile,servertime)
+        public Shipyard(string profile) : base(profile)
         {
         }
 

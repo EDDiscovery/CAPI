@@ -23,15 +23,12 @@ namespace CAPI
 
     public class CAPIEndPointBaseClass
     {
-        public CAPIEndPointBaseClass(string profile, DateTime servertime)
+        public CAPIEndPointBaseClass(string profile)
         {
             json = JToken.Parse(profile, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL);
-            ServerTimeUTC = servertime;
         }
 
         public JToken Json { get { return json; } }
-
-        public DateTime ServerTimeUTC { get; set; }
 
         public class Commodity
         {

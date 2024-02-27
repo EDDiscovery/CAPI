@@ -26,7 +26,7 @@ namespace CAPI
 
     public class Market : CAPIEndPointBaseClass
     {
-        public Market(string profile, DateTime servertime) : base(profile,servertime)
+        public Market(string profile) : base(profile)
         {
         }
 

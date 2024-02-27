@@ -203,7 +203,7 @@ namespace CAPIDemo
 
                 richTextBox.AppendText("------------------------- MARKET" + Environment.NewLine);
 
-                Market ep = p != null ? new Market(p,servertime) : null;
+                Market ep = p != null ? new Market(p) : null;
                 //Market mk = new Market(File.ReadAllText(@"c:\code\logs\capi\market-default(1).json")); // debug
 
                 if (ep != null && ep.IsValid)
@@ -374,12 +374,12 @@ namespace CAPIDemo
                         string json = JToken.Parse(p, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL).ToString(true);
                         File.WriteAllText(rootpath + "\\fleetcarrierdata.json", json);
                         System.Diagnostics.Debug.WriteLine("Fleet JSON" + json);
-                        ep = new FleetCarrier(p,servertime);
+                        ep = new FleetCarrier(p);
                     }
                 }
                 else
                 {
-                    ep = new FleetCarrier(File.ReadAllText(@"c:\code\fleetcarrier.json"),DateTime.UtcNow); // debug
+                    ep = new FleetCarrier(File.ReadAllText(@"c:\code\fleetcarrier.json")); // debug
                 }
 
                 richTextBox.AppendText("------------------------- FLEET CARRIER" + Environment.NewLine);
@@ -684,7 +684,7 @@ namespace CAPIDemo
 
                 richTextBox.AppendText("------------------------- SHIPYARD" + Environment.NewLine);
 
-                Shipyard ep = p!=null ? new Shipyard(p,servertime) : null;
+                Shipyard ep = p!=null ? new Shipyard(p) : null;
                 if (ep!=null && ep.IsValid)
                 {
                     ReflectProperties(ep, " ");
