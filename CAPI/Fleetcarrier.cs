@@ -126,7 +126,7 @@ namespace CAPI
         public int ServicesOptionalCount { get { return json["finance"].I("numOptionalServices").Int(0); } }
         public long DebtThreshold { get { return json["finance"].I("debtThreshold").Long(0); } }
         public long MaintenanceCost { get { return json["finance"].I("maintenance").Long(0); } }
-        public long MaintenanceCostToToDate { get { return json["finance"].I("maintenanceToDate").Long(0); } }
+        public long MaintenanceCostToDate { get { return json["finance"].I("maintenanceToDate").Long(0); } }
         public long CoreCost { get { return json["finance"].I("coreCost").Long(0); } }
         public long ServicesCost { get { return json["finance"].I("servicesCost").Long(0); } }
         public long ServicesCostToDate { get { return json["finance"].I("servicesCostToDate").Long(0); } }
