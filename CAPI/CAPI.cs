@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -104,7 +103,7 @@ namespace CAPI
                 }
                 catch( Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine("CAPI Logout exception" + ex);
+                    System.Diagnostics.Trace.WriteLine("CAPI Logout exception" + ex);
                 }
             }
             return false;
@@ -136,7 +135,7 @@ namespace CAPI
             }
             catch (EliteDangerousCompanionWebException ws)                 // web exceptions, they happen. don't lost the refresh token over it
             {
-                System.Diagnostics.Debug.WriteLine(ws);
+                System.Diagnostics.Trace.WriteLine(ws);
                 return false;
             }
             catch (Exception)
@@ -219,7 +218,7 @@ namespace CAPI
             }
             catch (WebException wex)
             {
-                System.Diagnostics.Debug.WriteLine("CAPI Refresh Web exception " + wex.Status);
+                System.Diagnostics.Trace.WriteLine("CAPI Refresh Web exception " + wex.Status);
                 if (wex.Status == WebExceptionStatus.ProtocolError)         // seen when a bad refresh token is sent to frontier
                 {
                     LogOut();
@@ -250,7 +249,7 @@ namespace CAPI
                                                                             // code challenge, authsessioID and the URI to call back on
             string CALLBACK_URL = $"{URI}://auth/";
             string webURL = $"{AUTH_SERVER}{AUTH_URL}" + $"?response_type=code&{AUDIENCE}&{SCOPE}&client_id={clientID}&code_challenge={codeChallenge}&code_challenge_method=S256&state={authSessionID}&redirect_uri={Uri.EscapeDataString(CALLBACK_URL)}";
-            Process.Start(webURL);
+            System.Diagnostics.Process.Start(webURL);
 
             CurrentState = State.AwaitingCallback;
             StatusChange?.Invoke(CurrentState);
@@ -352,8 +351,9 @@ namespace CAPI
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                System.Diagnostics.Trace.WriteLine($"URL Call back exception " + ex);
                 StatusChange?.Invoke(State.AuthorizationFailed);
                 CurrentState = State.LoggedOut;
             }
@@ -489,12 +489,12 @@ namespace CAPI
                     }
                     catch (EliteDangerousCompanionWebException ws)
                     {
-                        System.Diagnostics.Debug.WriteLine(ws);
+                        System.Diagnostics.Trace.WriteLine(ws);
                         return null;
                     }
                     catch (Exception ex)        // any other and we are logged out
                     {
-                        System.Diagnostics.Debug.WriteLine(ex);
+                        System.Diagnostics.Trace.WriteLine(ex);
                         AskForLogin();          // ask for a login
                         return null;
                     }
@@ -533,7 +533,7 @@ namespace CAPI
                 catch (WebException wex)
                 {
                     status = HttpStatusCode.ServiceUnavailable;
-                    System.Diagnostics.Debug.WriteLine("CAPI Failed to obtain response, error code " + wex.Status);
+                    System.Diagnostics.Trace.WriteLine("CAPI Failed to obtain response, error code " + wex.Status);
                     return null;
                 }
             }
@@ -557,14 +557,14 @@ namespace CAPI
             {
                 if (stream == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("CAPI No response stream");
+                    System.Diagnostics.Trace.WriteLine("CAPI No response stream");
                     return null;
                 }
                 var reader = new StreamReader(stream, encoding);
                 string data = reader.ReadToEnd();
                 if (string.IsNullOrEmpty(data) || data.Trim() == "")
                 {
-                    System.Diagnostics.Debug.WriteLine("CAPI No data returned");
+                    System.Diagnostics.Trace.WriteLine("CAPI No data returned");
                     return null;
                 }
 
