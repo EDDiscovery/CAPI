@@ -47,9 +47,16 @@ namespace CAPI
         {
             return GetModules(json.I("modules").Object());
         }
-        public List<Ship> GetShips()        // may be null if no shipyard
+        public List<Ship> GetPurchasableShips()        // may be null if no shipyard
         {
-            return GetShips(json.I("ships").I("shipyard_list").Object());
+            var canbuyships = json.I("ships").I("shipyard_list").Object();
+            return GetShips(canbuyships);
+        }
+
+        public List<Ship> GetUnobtainableShips()        // may be null if no shipyard
+        {
+            var cantbuyships = json.I("ships").I("unavailable_list").Array();
+            return GetShips(cantbuyships);
         }
 
     }

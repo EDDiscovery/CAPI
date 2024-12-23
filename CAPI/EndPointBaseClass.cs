@@ -80,6 +80,7 @@ namespace CAPI
             public long Stock {get;set;}
         };
 
+        [System.Diagnostics.DebuggerDisplay("{ID} {Category} {Name} {Cost} stock {Stock}")]
         public class Module
         {
             public long ID { get; set; }
@@ -89,6 +90,7 @@ namespace CAPI
             public long Stock { get; set; }
         }
 
+        [System.Diagnostics.DebuggerDisplay("{ID} {Name} {BaseValue} {SKU}")]
         public class Ship
         {
             public long ID { get; set; }
@@ -326,11 +328,13 @@ namespace CAPI
             return null;
         }
 
-        protected List<Ship> GetShips(JObject shiplist)        // may be null if no shipyard
+        // If no shiplist it will be empty
+        protected List<Ship> GetShips(JObject shiplist)       
         {
-            if (shiplist != null && shiplist.Count > 0)
+            List<Ship> list = new List<Ship>();
+
+            if (shiplist?.Count > 0)
             {
-                List<Ship> list = new List<Ship>();
                 foreach (var kvp in shiplist)
                 {
                     JObject data = kvp.Value.Object();
@@ -352,6 +356,29 @@ namespace CAPI
                 return list;
             }
             return null;
+        }
+
+        // If no shiplist it will be empty
+        protected List<Ship> GetShips(JArray shiplist)    
+        {
+            List<Ship> list = new List<Ship>();
+
+            if (shiplist?.Count > 0)
+            {
+                foreach (var data in shiplist)
+                {
+                    Ship m = new Ship()
+                    {
+                        ID = data["id"].Long(),
+                        Name = data["name"].Str(),
+                        BaseValue = data["basevalue"].Long(),
+                        SKU = data["sku"].Str(),
+                    };
+
+                    list.Add(m);
+                }
+            }
+            return list;
         }
 
         protected QuickJSON.JToken json;
