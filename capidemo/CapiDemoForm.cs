@@ -753,17 +753,29 @@ namespace CAPIDemo
                         else
                             richTextBox.AppendText("No Modules" + Environment.NewLine);
                     }
-                    { 
-                        var ships = ep.GetShips();
+                    {
+                        var ships = ep.GetPurchasableShips();
                         if (ships != null)
                         {
-                            richTextBox.AppendText("ships" + Environment.NewLine);
+                            richTextBox.AppendText("purchasable ships" + Environment.NewLine);
                             foreach (var v in ships)
                                 richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.BaseValue) + ", ");
                             richTextBox.AppendText(Environment.NewLine);
                         }
                         else
-                            richTextBox.AppendText("No Ships" + Environment.NewLine);
+                            richTextBox.AppendText("No purchasable ships" + Environment.NewLine);
+                    }
+                    {
+                        var ships = ep.GetUnobtainableShips();
+                        if (ships != null)
+                        {
+                            richTextBox.AppendText("unobtainable ships" + Environment.NewLine);
+                            foreach (var v in ships)
+                                richTextBox.AppendText(string.Format("  {0} {1}", v.Name, v.BaseValue) + ", ");
+                            richTextBox.AppendText(Environment.NewLine);
+                        }
+                        else
+                            richTextBox.AppendText("No unobtainable ships" + Environment.NewLine);
                     }
 
                 }
