@@ -41,6 +41,7 @@
             this.buttonCG = new System.Windows.Forms.Button();
             this.checkBoxBeta = new System.Windows.Forms.CheckBox();
             this.checkBoxLegacy = new System.Windows.Forms.CheckBox();
+            this.buttonSquadronCarrier = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonLoginOne
@@ -175,6 +176,16 @@
             this.checkBoxLegacy.UseVisualStyleBackColor = true;
             this.checkBoxLegacy.CheckedChanged += new System.EventHandler(this.checkBoxLegacy_CheckedChanged);
             // 
+            // buttonSquadronCarrier
+            // 
+            this.buttonSquadronCarrier.Location = new System.Drawing.Point(21, 292);
+            this.buttonSquadronCarrier.Name = "buttonSquadronCarrier";
+            this.buttonSquadronCarrier.Size = new System.Drawing.Size(101, 23);
+            this.buttonSquadronCarrier.TabIndex = 2;
+            this.buttonSquadronCarrier.Text = "Squadron Carrier";
+            this.buttonSquadronCarrier.UseVisualStyleBackColor = true;
+            this.buttonSquadronCarrier.Click += new System.EventHandler(this.buttonSquadronCarrier_Click);
+            // 
             // CapiDemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -185,6 +196,7 @@
             this.Controls.Add(this.dateTimePicker);
             this.Controls.Add(this.richTextBox);
             this.Controls.Add(this.button4);
+            this.Controls.Add(this.buttonSquadronCarrier);
             this.Controls.Add(this.buttonCG);
             this.Controls.Add(this.buttonFleetCarrier);
             this.Controls.Add(this.buttonJournal);
@@ -215,6 +227,7 @@
         private System.Windows.Forms.Button buttonCG;
         private System.Windows.Forms.CheckBox checkBoxBeta;
         private System.Windows.Forms.CheckBox checkBoxLegacy;
+        private System.Windows.Forms.Button buttonSquadronCarrier;
     }
 }
 

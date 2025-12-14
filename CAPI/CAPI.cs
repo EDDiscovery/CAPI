@@ -427,9 +427,13 @@ namespace CAPI
         {
             return Get(FLEETCARRIER_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
         }
+        public string SquadronCarrier(out DateTime servertime, bool nocontentreturnemptystring = false)
+        {
+            return Get(SQUADRONCARRIER_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
+        }
 
         // obtain CG end point - may return null
-        
+
         public string CommunityGoals(out DateTime servertime, bool nocontentreturnemptystring = false)
         {
             return Get(COMMUNITYGOALS_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
@@ -627,6 +631,7 @@ namespace CAPI
         private static readonly string SHIPYARD_URL = "/shipyard";
         private static readonly string JOURNAL_URL = "/journal";
         private static readonly string FLEETCARRIER_URL = "/fleetcarrier";
+        private static readonly string SQUADRONCARRIER_URL = "/squadron";
         private static readonly string COMMUNITYGOALS_URL = "/communitygoals";
 
         private readonly string clientID; // we are not allowed to check the client ID into version control or publish it to 3rd parties

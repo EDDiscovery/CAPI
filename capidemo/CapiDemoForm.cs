@@ -669,6 +669,26 @@ namespace CAPIDemo
 
         }
 
+        private void buttonSquadronCarrier_Click(object sender, EventArgs e)
+        {
+            if (capi.Active)
+            {
+                richTextBox.AppendText("------------------------- SQUADRON CARRIER" + Environment.NewLine);
+
+                string p = capi.SquadronCarrier(out DateTime servertime);
+                if (p != null)
+                {
+                    string json = JToken.Parse(p, JToken.ParseOptions.AllowTrailingCommas | JToken.ParseOptions.CheckEOL).ToString(true);
+                    File.WriteAllText(rootpath + "\\squadroncarrierdata.json", json);
+                    System.Diagnostics.Debug.WriteLine("Squadron JSON" + json);
+                    richTextBox.AppendText(json.ToString());
+                }
+
+                richTextBox.AppendText("------------------------- /SQUADRON CARRIER" + Environment.NewLine);
+                richTextBox.ScrollToCaret();
+            }
+        }
+
         private void buttonShipyard_Click(object sender, EventArgs e)
         {
             if (capi.Active)
@@ -865,6 +885,7 @@ namespace CAPIDemo
         {
             richTextBox.Clear();
         }
+
 
     }
 }
