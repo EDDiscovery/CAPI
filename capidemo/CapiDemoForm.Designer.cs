@@ -42,6 +42,8 @@
             this.checkBoxBeta = new System.Windows.Forms.CheckBox();
             this.checkBoxLegacy = new System.Windows.Forms.CheckBox();
             this.buttonSquadronCarrier = new System.Windows.Forms.Button();
+            this.checkBoxCarrierRead = new System.Windows.Forms.CheckBox();
+            this.checkBoxSquadronRead = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // buttonLoginOne
@@ -79,9 +81,9 @@
             this.richTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBox.Location = new System.Drawing.Point(137, 12);
+            this.richTextBox.Location = new System.Drawing.Point(198, 12);
             this.richTextBox.Name = "richTextBox";
-            this.richTextBox.Size = new System.Drawing.Size(1319, 1017);
+            this.richTextBox.Size = new System.Drawing.Size(1284, 1017);
             this.richTextBox.TabIndex = 3;
             this.richTextBox.Text = "";
             this.richTextBox.DoubleClick += new System.EventHandler(this.richTextBox_DoubleClick);
@@ -186,11 +188,33 @@
             this.buttonSquadronCarrier.UseVisualStyleBackColor = true;
             this.buttonSquadronCarrier.Click += new System.EventHandler(this.buttonSquadronCarrier_Click);
             // 
+            // checkBoxCarrierRead
+            // 
+            this.checkBoxCarrierRead.AutoSize = true;
+            this.checkBoxCarrierRead.Location = new System.Drawing.Point(4, 452);
+            this.checkBoxCarrierRead.Name = "checkBoxCarrierRead";
+            this.checkBoxCarrierRead.Size = new System.Drawing.Size(153, 17);
+            this.checkBoxCarrierRead.TabIndex = 6;
+            this.checkBoxCarrierRead.Text = "Read Carrier From C:\\code";
+            this.checkBoxCarrierRead.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxSquadronRead
+            // 
+            this.checkBoxSquadronRead.AutoSize = true;
+            this.checkBoxSquadronRead.Location = new System.Drawing.Point(4, 475);
+            this.checkBoxSquadronRead.Name = "checkBoxSquadronRead";
+            this.checkBoxSquadronRead.Size = new System.Drawing.Size(171, 17);
+            this.checkBoxSquadronRead.TabIndex = 6;
+            this.checkBoxSquadronRead.Text = "Read Squadrom From C:\\code";
+            this.checkBoxSquadronRead.UseVisualStyleBackColor = true;
+            // 
             // CapiDemoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1494, 1055);
+            this.Controls.Add(this.checkBoxSquadronRead);
+            this.Controls.Add(this.checkBoxCarrierRead);
             this.Controls.Add(this.checkBoxLegacy);
             this.Controls.Add(this.checkBoxBeta);
             this.Controls.Add(this.dateTimePicker);
@@ -228,6 +252,8 @@
         private System.Windows.Forms.CheckBox checkBoxBeta;
         private System.Windows.Forms.CheckBox checkBoxLegacy;
         private System.Windows.Forms.Button buttonSquadronCarrier;
+        private System.Windows.Forms.CheckBox checkBoxCarrierRead;
+        private System.Windows.Forms.CheckBox checkBoxSquadronRead;
     }
 }
 

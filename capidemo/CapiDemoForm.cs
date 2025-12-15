@@ -360,7 +360,7 @@ namespace CAPIDemo
 
         private void buttonFleetCarrier_Click(object sender, EventArgs e)
         {
-            bool debugfile = false;
+            bool debugfile = checkBoxCarrierRead.Checked;
 
             if (debugfile || capi.Active)
             {
@@ -675,7 +675,7 @@ namespace CAPIDemo
 
         private void buttonSquadronCarrier_Click(object sender, EventArgs e)
         {
-            bool debugfile = true;
+            bool debugfile = checkBoxSquadronRead.Checked;
 
             if (debugfile || capi.Active)
             {
