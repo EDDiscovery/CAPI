@@ -427,7 +427,7 @@ namespace CAPI
         {
             return Get(FLEETCARRIER_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
         }
-        public string SquadronCarrier(out DateTime servertime, bool nocontentreturnemptystring = false)
+        public string Squadrons(out DateTime servertime, bool nocontentreturnemptystring = false)
         {
             return Get(SQUADRONCARRIER_URL, out HttpStatusCode _, out servertime, nocontentreturnemptystring);
         }

@@ -30,6 +30,7 @@ namespace CAPI
 
         public JToken Json { get { return json; } }
 
+        [System.Diagnostics.DebuggerDisplay("{Name} b{Buy} s{Sell} d{Demand} s{Stock}")]
         public class Commodity
         {
             public string Name{get;set;}
@@ -46,6 +47,7 @@ namespace CAPI
             public string Category;
         };
 
+        [System.Diagnostics.DebuggerDisplay("{Name} s{Stock} p{Price}")]
         public class OrdersCommoditySales
         {
             public string Name {get;set;}
@@ -54,6 +56,7 @@ namespace CAPI
             public bool Blackmarket {get;set;}
         };
 
+        [System.Diagnostics.DebuggerDisplay("{Name} t{Total} o{Outstanding} p{Price}")]
         public class OrdersCommodityPurchases
         {
             public string Name {get;set;}
@@ -62,6 +65,8 @@ namespace CAPI
             public long Price {get;set;}
             public bool Blackmarket {get;set;}
         };
+
+        [System.Diagnostics.DebuggerDisplay("{Name} t{Total} o{Outstanding} p{Price}")]
         public class OrdersMRPurchases
         {
             public string Name {get;set;}
@@ -71,6 +76,7 @@ namespace CAPI
             public long Price {get;set;}
         };
 
+        [System.Diagnostics.DebuggerDisplay("{Name} s{Stock} p{Price}")]
         public class OrdersMRSales
         {
             public long ID {get;set;}
@@ -270,6 +276,7 @@ namespace CAPI
                 {
                     ID = data["id"].Long(),
                     Name = data["name"].Str(),
+                    LocName = data["locName"].Str(),
                     Legality = data["legality"].Str(),
                     Buy = data["buyPrice"].Long(),
                     Sell = data["sellPrice"].Long(),
@@ -279,8 +286,14 @@ namespace CAPI
                     Stock = data["stock"].Long(),
                     Demand = data["demand"].Long(),
                     Category = data["categoryname"].Str(),
-                    LocName = data["locName"].Str(),
                 };
+
+                var qty = data["qty"];
+
+                if (qty?.IsString ?? false)       // in a effing string format in squadrons/commodities
+                    m.Stock = data["qty"].Str().InvariantParseInt(0);
+                if (qty?.IsLong ?? false)       
+                    m.Stock = data["qty"].Long();
 
                 return m;
             }
