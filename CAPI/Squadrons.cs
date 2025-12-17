@@ -82,6 +82,7 @@ namespace CAPI
         public FleetCarrier Carrier { get; private set; }
         public long Credits { get { return json["bank"].I("credits").I("All").I(0).I("qty").Str("0")?.InvariantParseLong(0) ?? 0; } }
         public long CarrierCredits { get { return json["bank"].I("credits").I("Carrier Balance").I(0).I("qty").Str("0")?.InvariantParseLong(0) ?? 0; } }
+        public Member[] Members { get; private set; }   // may be null
         public Dictionary<string, List<Commodity>> Commodities { get; private set; }        // may be null
         public Dictionary<string, List<Commodity>> MicroResources { get; private set; }     // may be null
 

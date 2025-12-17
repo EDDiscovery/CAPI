@@ -714,10 +714,17 @@ namespace CAPIDemo
                     richTextBox.AppendText($"Member {m.Name} {m.Joined} flying {m.ShipName}" + Environment.NewLine);
                 }
 
-                foreach ( var kvp in ep.Commodities)
+                foreach (var kvp in ep.Commodities)
                 {
                     richTextBox.AppendText($"Commodities {kvp.Key}" + Environment.NewLine);
-                    foreach ( var c in kvp.Value)
+                    foreach (var c in kvp.Value)
+                        richTextBox.AppendText($"  {c.Name} {c.Stock}" + Environment.NewLine);
+                }
+
+                foreach (var kvp in ep.MicroResources)
+                {
+                    richTextBox.AppendText($"Microresources {kvp.Key}" + Environment.NewLine);
+                    foreach (var c in kvp.Value)
                         richTextBox.AppendText($"  {c.Name} {c.Stock}" + Environment.NewLine);
                 }
 
