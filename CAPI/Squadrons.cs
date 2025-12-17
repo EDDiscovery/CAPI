@@ -25,7 +25,10 @@ namespace CAPI
     {
         public Squadrons(string jsonstr) : base(jsonstr)
         {
-            Carrier = new FleetCarrier(json["squadronCarrier"].ToString());
+            var fc = json["squadronCarrier"];
+            if ( fc != null )
+                Carrier = new FleetCarrier(fc.ToString());
+
             JArray mem = json["members"].Array();
             if ( mem != null )
             {
@@ -113,10 +116,6 @@ namespace CAPI
             public string RequestLetter => json["requestletter"].Str().FromHexString();
             public string Biography => json["biography"].Str().FromHexString();
         }
-
-        public Member[] Members { get; private set; }
-
-        //.. "bank"
 
     }
 }
