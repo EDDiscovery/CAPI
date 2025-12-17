@@ -35,13 +35,24 @@ namespace CAPI
             }
 
             var commodities = json["bank"].I("commodities").Object();
-            if ( commodities != null )
+            if (commodities != null)
             {
                 Commodities = new Dictionary<string, List<Commodity>>();
-                foreach( var kvp in commodities )
+                foreach (var kvp in commodities)
                 {
                     var clist = GetCommodityList(kvp.Value.Array());
                     Commodities[kvp.Key] = clist;
+                }
+            }
+
+            var microresources = json["bank"].I("microresources").Object();
+            if (microresources != null)
+            {
+                MicroResources = new Dictionary<string, List<Commodity>>();
+                foreach (var kvp in microresources)
+                {
+                    var clist = GetCommodityList(kvp.Value.Array());
+                    MicroResources[kvp.Key] = clist;
                 }
             }
         }
@@ -68,7 +79,8 @@ namespace CAPI
         public FleetCarrier Carrier { get; private set; }
         public long Credits { get { return json["bank"].I("credits").I("All").I(0).I("qty").Str("0")?.InvariantParseLong(0) ?? 0; } }
         public long CarrierCredits { get { return json["bank"].I("credits").I("Carrier Balance").I(0).I("qty").Str("0")?.InvariantParseLong(0) ?? 0; } }
-        public Dictionary<string, List<Commodity>> Commodities { get; private set; }
+        public Dictionary<string, List<Commodity>> Commodities { get; private set; }        // may be null
+        public Dictionary<string, List<Commodity>> MicroResources { get; private set; }     // may be null
 
         public class Member
         {
